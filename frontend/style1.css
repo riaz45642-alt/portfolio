@@ -24,13 +24,24 @@
     --brand-linkedin: #0a66c2;
 }
 
+html {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--primary-bg);
     color: var(--text-color);
     line-height: 1.6;
     overflow-x: hidden;
+    max-width: 100%;
     perspective: 1000px; /* For 3D transformations */
+}
+
+img, svg, video, iframe, table {
+    max-width: 100%;
+    height: auto;
 }
 
 .container {
@@ -651,16 +662,27 @@ h3 span:hover {
 
 @media (max-width: 768px) {
     .nav {
-        width: 100%;
-        border-radius: 0;
-        margin-top: 0;
-        justify-content: space-between; /* Better spacing for mobile nav */
-        padding: 0 10px;
+        width: calc(100% - 20px);
+        max-width: calc(100% - 20px);
+        margin: 10px auto 0;
+        border-radius: 30px;
+        justify-content: flex-start;
+        padding: 6px 14px;
+        gap: 4px;
+        height: auto;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar {
+        display: none;
     }
     .nav button {
-        padding: 5px 8px;
+        padding: 10px 12px;
         font-size: 12px;
         border-radius: 20px;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
     .nav button::before { /* Adjust pseudo-element for smaller buttons */
         border-radius: 20px;
@@ -668,6 +690,8 @@ h3 span:hover {
     .nav h3 {
         font-size: 18px;
         letter-spacing: 1.5px;
+        padding: 0 8px;
+        flex-shrink: 0;
     }
     h3 span {
         font-size: 25px;
@@ -708,11 +732,13 @@ h3 span:hover {
 
 @media (max-width: 480px) {
     .nav {
-        height: 55px;
+        height: auto;
+        padding: 5px 10px;
+        gap: 2px;
     }
     .nav button {
-        font-size: 10px;
-        padding: 4px 6px;
+        font-size: 11px;
+        padding: 8px 10px;
     }
     .nav h3 {
         font-size: 16px;
