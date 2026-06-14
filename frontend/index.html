@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Ahmad - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav">
+                <h3><span>A</span>HM<span>A</span>D</h3>
+            </div>
+        </nav>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="profile-card">
+                    <div class="profile-pic-wrap">
+                        <img src="picture.jfif" alt="Muhammad Ahmad" class="profile-pic">
+                    </div>
+                    <div class="profile-info">
+                        <span class="designation">A Frontend Developer</span>
+                        <h3>Muhammad Ahmad</h3>
+                        <p>An ambitious creative professional</p>
+                    </div>
+                </div>
+                <div class="intro-text">
+                    <h2>Check out our latest design trends and projects</h2>
+                    <p>
+                        Explore my creative journey through diverse projects, where design meets innovation. Each piece reflects a commitment to aesthetics and functionality.
+                    </p>
+                </div>
+            </div>
+            <div class="grid-cards">
+                <button class="card card-about" onclick="location.href='about.html'">
+                    <i class="fas fa-user"></i>
+                    <h3>ABOUT ME</h3>
+                    <p>Resume</p>
+                </button>
+                <button class="card card-my-works" onclick="location.href='projects.html'">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>MY WORKS</h3>
+                    <p>Projects</p>
+                </button>
+                <button class="card card-stats-1" id="likeCard" onclick="sendLike()" title="Click to like!" aria-label="Like this portfolio">
+                    <i class="fas fa-thumbs-up" id="likeIcon"></i>
+                    <span id="likeCount">0</span>
+                </button>
+                <button class="card card-stats-3" onclick="location.href='comments.html'" aria-label="View comments">
+                    <i class="fas fa-users"></i>
+                    <span>0</span>
+                </button>
+            </div>
+            <div class="grid-cards lets-talk-row">
+                <button class="card card-lets-talk" onclick="location.href='contact.html'">
+                    <span>Let's</span>
+                    <span>Talk</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelector('.menu-toggle').addEventListener('click', () => {
+            document.querySelector('.nav').classList.toggle('active');
+        });
+
+        const API_BASE = '/api';
+        const likeCountEl = document.getElementById('likeCount');
+        const likeCard = document.getElementById('likeCard');
+        const LIKE_STORAGE_KEY = 'portfolio_liked';
+
+        async function loadLikes() {
+            try {
+                const res = await fetch(`${API_BASE}/likes`);
+                if (!res.ok) throw new Error('API not available');
+                const data = await res.json();
+                likeCountEl.textContent = data.total;
+            } catch {
+                likeCountEl.textContent = '0';
+            }
+            if (localStorage.getItem(LIKE_STORAGE_KEY) === 'true') {
+                likeCard.classList.add('liked');
+            }
+        }
+
+        async function sendLike() {
+            if (localStorage.getItem(LIKE_STORAGE_KEY) === 'true') {
+                likeCard.classList.add('liked');
+                return;
+            }
+            likeCard.classList.add('liked');
+            const current = parseInt(likeCountEl.textContent, 10) || 0;
+            likeCountEl.textContent = current + 1; // optimistic update
+
+            try {
+                const res = await fetch(`${API_BASE}/likes`, { method: 'POST' });
+                if (!res.ok) throw new Error('API not available');
+                const data = await res.json();
+                likeCountEl.textContent = data.total;
+                localStorage.setItem(LIKE_STORAGE_KEY, 'true');
+            } catch {
+                localStorage.setItem(LIKE_STORAGE_KEY, 'true');
+            }
+        }
+
+        loadLikes();
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Muhammad Ahmad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav">
+                <button onclick="location.href='index.html'">Home</button>
+                <button onclick="location.href='about.html'">About</button>
+                <h3><span>A</span>HM<span>A</span>D</h3>
+                <button onclick="location.href='projects.html'">Projects</button>
+                <button onclick="location.href='comments.html'">Comments</button>
+                <button onclick="location.href='contact.html'" style="color:white">Contact</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>Get In Touch</h1>
+            <p>Have a project in mind? Let’s work on it together.</p>
+        </div>
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> &nbsp;/&nbsp; Contact
+        </div>
+
+        <div class="contact-layout">
+            <div class="contact-info-card">
+                <h2>Let's Talk</h2>
+                <p>I'm currently available for freelance and full-time work. Feel free to contact me.</p>
+                <div class="contact-item">
+                    <div class="icon"><i class="fab fa-whatsapp"></i></div>
+                    <div class="details">
+                        <span>WhatsApp</span>
+                        <span><a href="https://wa.me/923234567863" target="_blank" style="color:inherit;text-decoration:none">+92 323 4567863</a></span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon"><i class="fas fa-envelope"></i></div>
+                    <div class="details">
+                        <span>Email</span>
+                        <span><a href="mailto:ahmad.r.27@gmail.com" style="color:inherit;text-decoration:none">ahmad.r.27@gmail.com</a></span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon"><i class="fas fa-phone"></i></div>
+                    <div class="details">
+                        <span>Phone</span>
+                        <span>+92 3234567863</span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="details">
+                        <span>Location</span>
+                        <span>Sheikhupura, Pakistan</span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon"><i class="fas fa-clock"></i></div>
+                    <div class="details">
+                        <span>Availability</span>
+                        <span>Mon – Sat</span>
+                    </div>
+                </div>
+
+                <div class="social-links" style="justify-content:flex-start;margin-top:30px">
+                    <a href="https://wa.me/923234567863" class="social-whatsapp" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://github.com/riaz45642-alt" class="social-github" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/ahmad-riaz-785636359/" class="social-linkedin" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/_amd_9_27/" class="social-instagram" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="contact-form-card scroll-reveal">
+                <h2>Send a Message</h2>
+                <div class="alert success" id="alertSuccess">
+                    <i class="fas fa-check-circle"></i> Opening WhatsApp with your message...
+                </div>
+                <div class="alert error" id="alertError">
+                    <i class="fas fa-exclamation-circle"></i> Something went wrong. Please try again or email me directly.
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="firstName" placeholder="" />
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="lastName" placeholder="" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="" />
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select id="subject">
+                        <option value="">Select a subject...</option>
+                        <option value="freelance">Freelance Project</option>
+                        <option value="fulltime">Full-Time Opportunity</option>
+                        <option value="collaboration">Collaboration</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="message" placeholder="Tell me about your project or idea..."></textarea>
+                </div>
+
+                <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+                    <i class="fab fa-whatsapp"></i> Send via WhatsApp
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const WHATSAPP_NUMBER = '923234567863'; // international format, no + or leading 0
+
+        function submitForm() {
+            const successAlert = document.getElementById('alertSuccess');
+            const errorAlert = document.getElementById('alertError');
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value.trim();
+
+            // Basic validation
+            if (!firstName || !email || !message) {
+                errorAlert.textContent = '⚠️ Please fill in your name, email, and message.';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                setTimeout(() => errorAlert.style.display = 'none', 4000);
+                return;
+            }
+
+            errorAlert.style.display = 'none';
+
+            const subjectLabel = subject
+                ? document.getElementById('subject').options[document.getElementById('subject').selectedIndex].text
+                : 'General Inquiry';
+
+            const text =
+                `New message from Portfolio Contact Form\n\n` +
+                `Name: ${firstName} ${lastName}\n` +
+                `Email: ${email}\n` +
+                `Subject: ${subjectLabel}\n` +
+                `Message: ${message}`;
+
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+
+            successAlert.style.display = 'block';
+            window.open(whatsappUrl, '_blank');
+
+            // Reset form
+            ['firstName', 'lastName', 'email', 'message'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('subject').value = '';
+
+            setTimeout(() => successAlert.style.display = 'none', 5000);
+        }
+    </script>
+    <script src="scroll-reveal.js"></script>
+</body>
+</html>
