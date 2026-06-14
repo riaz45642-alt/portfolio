@@ -4,21 +4,20 @@ const pool = require('../models/db');
 const getProjects = async (req, res) => {
   try {
     const { category } = req.query;
-    let query = 'SELECT * FROM projects ORDER BY created_at DESC';
+    let query  = 'SELECT * FROM projects ORDER BY created_at DESC';
     let params = [];
 
     if (category && category !== 'all') {
-      query = 'SELECT * FROM projects WHERE category = ? ORDER BY created_at DESC';
+      query  = 'SELECT * FROM projects WHERE category = $1 ORDER BY created_at DESC';
       params = [category];
     }
 
-    const [rows] = await pool.execute(query, params);
+    const { rows } = await pool.query(query, params);
 
-    // Parse JSON string columns to arrays
     const projects = rows.map(p => ({
       ...p,
-      tags: typeof p.tags === 'string' ? JSON.parse(p.tags) : (p.tags || []),
-      images: typeof p.images === 'string' ? JSON.parse(p.images) : (p.images || [])
+      tags:   Array.isArray(p.tags)   ? p.tags   : JSON.parse(p.tags   || '[]'),
+      images: Array.isArray(p.images) ? p.images : JSON.parse(p.images || '[]')
     }));
 
     res.json(projects);
@@ -28,20 +27,30 @@ const getProjects = async (req, res) => {
   }
 };
 
-// POST /api/projects (add new project)
+// POST /api/projects
 const addProject = async (req, res) => {
-  const { title, description, tags, images, category, icon, github, demo } = req.body || {};
+  const { title, description, tags, images, category, icon, github, demo, featured } = req.body || {};
 
   if (!title || !description) {
     return res.status(400).json({ error: 'Title and description are required.' });
   }
 
   try {
-    const [result] = await pool.execute(
-      'INSERT INTO projects (title, description, tags, images, category, icon, github, demo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [title, description, JSON.stringify(tags || []), JSON.stringify(images || []), category || 'frontend', icon || 'fas fa-code', github || '#', demo || '#']
+    const { rows } = await pool.query(
+      `INSERT INTO projects (title, description, tags, images, category, icon, github, demo, featured)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+      [
+        title, description,
+        JSON.stringify(tags   || []),
+        JSON.stringify(images || []),
+        category || 'frontend',
+        icon     || 'fas fa-code',
+        github   || '#',
+        demo     || '#',
+        featured || false
+      ]
     );
-    res.status(201).json({ success: true, id: result.insertId });
+    res.status(201).json({ success: true, id: rows[0].id });
   } catch (err) {
     console.error('DB Error (addProject):', err.message);
     res.status(500).json({ error: 'Server error.' });

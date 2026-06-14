@@ -1,48 +1,57 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const path = require('path');
+const cors    = require('cors');
 
 const projectRoutes = require('./routes/projectRoutes');
-const likeRoutes = require('./routes/likeRoutes');
+const likeRoutes    = require('./routes/likeRoutes');
 const commentRoutes = require('./routes/commentRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors({ origin: '*' }));
+// CORS — Cloudflare Pages frontend allow karo
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:5500'
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, cb) => {
+    // No origin = same-origin / curl / Render health check
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error(`CORS blocked: ${origin}`));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, '../frontend')));
-
 // API Routes
 app.use('/api/projects', projectRoutes);
-app.use('/api/likes', likeRoutes);
+app.use('/api/likes',    likeRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/contact',  contactRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Ahmad Portfolio API is running', timestamp: new Date() });
+  res.json({
+    status: 'OK',
+    message: 'Ahmad Portfolio API is running',
+    timestamp: new Date()
+  });
 });
 
-// Catch-all → serve index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+// Root
+app.get('/', (req, res) => {
+  res.json({ message: 'Ahmad Portfolio API — use /api/health to check status' });
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`\n🚀 Server running at http://localhost:${PORT}`);
-  console.log(`📁 Serving frontend from: ../frontend`);
-  console.log(`🔗 API endpoints:`);
-  console.log(`   GET  /api/health`);
-  console.log(`   GET  /api/projects`);
-  console.log(`   GET  /api/likes`);
-  console.log(`   POST /api/likes`);
-  console.log(`   GET  /api/comments`);
-  console.log(`   POST /api/comments`);
-  console.log(`   POST /api/comments/:id/like\n`);
+  console.log(`\n🚀 Server running on port ${PORT}`);
+  console.log(`🔗 Health: http://localhost:${PORT}/api/health\n`);
 });

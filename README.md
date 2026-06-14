@@ -1,107 +1,92 @@
-# Muhammad Ahmad — Portfolio Website
+# Ahmad Portfolio — Deploy Guide
 
-A full-stack personal portfolio website built with HTML/CSS/JS (frontend) and Node.js + Express + MySQL (backend).
-
-## 📁 Project Structure
-
+## Structure
 ```
-portfolio/
-├── frontend/             # All HTML, CSS, JS files
-│   ├── index.html        # Homepage (Like system)
-│   ├── about.html         # About Me page (Resume PDF viewer)
-│   ├── projects.html      # Projects showcase
-│   ├── comments.html      # Unified Comments & Feedback system
-│   ├── contact.html       # Contact page (WhatsApp + Email)
-│   ├── style1.css         # Shared dark theme styles
-│   └── assets/
-│       └── Muhammad_Ahmad_Resume.pdf
-│
-└── backend/              # Node.js + Express API
-    ├── server.js          # Main entry point
-    ├── .env.example       # Environment config template (copy to .env)
-    ├── package.json
-    ├── routes/
-    │   ├── projectRoutes.js
-    │   ├── likeRoutes.js
-    │   └── commentRoutes.js
-    ├── controllers/
-    │   ├── projectController.js
-    │   ├── likeController.js
-    │   └── commentController.js
-    └── models/
-        ├── db.js          # MySQL connection pool
-        └── schema.sql      # Database setup script
+portfolio-main/
+├── backend/    → Render pe deploy hoga
+└── frontend/   → Cloudflare Pages pe deploy hoga
 ```
 
-## 🚀 Quick Start
+---
 
-### 1. Set up the database
+## STEP 1 — Supabase Database Setup
 
-```bash
-mysql -u root -p < backend/models/schema.sql
+1. https://supabase.com par jao → New Project banao
+2. Project ban jaye to **SQL Editor** open karo
+3. `backend/models/schema.sql` ka poora content paste karo → Run karo
+4. **Settings > Database > Connection String** se `postgresql://...` URL copy karo
+
+---
+
+## STEP 2 — Render Backend Deploy
+
+1. https://render.com par jao → New Web Service
+2. GitHub repo connect karo
+3. Settings:
+   - **Root Directory:** `backend`
+   - **Build Command:** `npm install`
+   - **Start Command:** `node server.js`
+   - **Environment:** Node
+
+4. **Environment Variables** add karo:
+   ```
+   DATABASE_URL = postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres
+   FRONTEND_URL = https://your-portfolio.pages.dev
+   PORT         = 5000
+   ```
+
+5. Deploy karo — URL note karo (e.g. `https://ahmad-portfolio.onrender.com`)
+
+---
+
+## STEP 3 — Frontend mein Render URL daalo
+
+Render URL milne ke baad **har HTML file** mein yeh line update karo:
+
+```javascript
+// Yeh line har .html file mein hai
+const API_BASE = 'https://YOUR-APP-NAME.onrender.com/api';
+//                         ↑ apna actual Render URL daalo
 ```
 
-### 2. Configure environment
+Files: `index.html`, `projects.html`, `comments.html`, `contact.html`
 
-```bash
-cd backend
-cp .env.example .env
-# Edit .env with your MySQL credentials
+Aur `frontend/_redirects` mein bhi:
+```
+/api/*  https://YOUR-APP-NAME.onrender.com/api/:splat  200
 ```
 
-### 3. Install dependencies and start
+---
 
-```bash
-cd backend
-npm install
-npm run dev      # Development (with nodemon)
-# or
-npm start        # Production
-```
+## STEP 4 — Cloudflare Pages Deploy
 
-### 4. Open in browser
+1. https://pages.cloudflare.com par jao → New Project
+2. GitHub repo connect karo
+3. Settings:
+   - **Root Directory:** `frontend`
+   - **Build Command:** (khali chhoro)
+   - **Output Directory:** (khali chhoro ya `/`)
 
-Visit: `http://localhost:5000`
+4. Deploy karo
 
-## 🖼️ Projects & Image Slider
+---
 
-Each project supports an `images` array (2–3 screenshots). On `projects.html`, these auto-rotate every 3.5 seconds and fully cover the project thumbnail area, with details shown below. To use real screenshots, place files under `frontend/assets/projects/` and reference them in the `images` array (or the `images` JSON column in the `projects` table).
+## STEP 5 — Test karo
 
-## ❤️ Like System
+Browser mein open karo:
+- `https://YOUR-APP-NAME.onrender.com/api/health` → `{"status":"OK"}` aana chahiye
+- `https://your-portfolio.pages.dev` → frontend kaam karna chahiye
 
-The homepage has a clickable Like button. Each visitor can like the portfolio once (tracked via `localStorage`). The like counter starts at **0** and is stored in the `likes` table, persisting across visits and deployments.
+---
 
-## 💬 Comments System
+## Changes Summary (MySQL → PostgreSQL)
 
-`comments.html` provides a unified feedback/comments page where visitors can:
-- Submit a comment with Name, Company (optional), Email, and Message
-- View all comments publicly, sorted newest first
-- Reply to any top-level comment (nested replies)
-- Like / appreciate any comment or reply
-
-All comments and replies are stored in the `comments` table (self-referencing via `parent_id`).
-
-## 📞 Contact
-
-The contact form on `contact.html` sends messages directly via **WhatsApp** (wa.me link) to +92 323 4567863. Email (`ahmad.r.27@gmail.com`) and social links (GitHub, LinkedIn, Instagram, WhatsApp) are also available and fully functional. No backend call is required for the contact form — it works on static hosting too.
-
-## 🔗 API Endpoints
-
-| Method | Endpoint                | Description                          |
-|--------|------------------------|---------------------------------------|
-| GET    | /api/health            | Health check                          |
-| GET    | /api/projects          | Fetch all projects                    |
-| GET    | /api/projects?category=frontend | Filter projects by category   |
-| POST   | /api/projects          | Add a new project                     |
-| GET    | /api/likes             | Get current like count                |
-| POST   | /api/likes             | Increment like count                  |
-| GET    | /api/comments          | Get all comments (with nested replies)|
-| POST   | /api/comments          | Add a comment or reply (with `parent_id`) |
-| POST   | /api/comments/:id/like | Like/appreciate a comment              |
-
-## 📋 Tech Stack
-
-**Frontend:** HTML5, CSS3, JavaScript, Font Awesome, Google Fonts  
-**Backend:** Node.js, Express.js  
-**Database:** MySQL  
-**Other:** CORS, dotenv
+| File | Kya badla |
+|------|-----------|
+| `backend/models/db.js` | `mysql2` hata ke `pg` Pool lagaya |
+| `backend/package.json` | `mysql2` hata ke `pg` lagaya |
+| `backend/models/schema.sql` | MySQL syntax → PostgreSQL syntax |
+| `backend/controllers/*.js` | `pool.execute()` → `pool.query()`, `?` → `$1,$2...` |
+| `backend/server.js` | Proper CORS, static serve hata diya |
+| `frontend/*.html` | `API_BASE` → Render URL |
+| `frontend/_redirects` | Cloudflare proxy rules |

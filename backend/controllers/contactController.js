@@ -1,5 +1,7 @@
 const pool = require('../models/db');
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // POST /api/contact
 const submitContact = async (req, res) => {
   const { name, email, subject, message } = req.body;
@@ -7,21 +9,19 @@ const submitContact = async (req, res) => {
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Name, email, and message are required.' });
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ error: 'Invalid email address.' });
   }
 
   try {
-    const [result] = await pool.execute(
-      'INSERT INTO contacts (name, email, subject, message) VALUES (?, ?, ?, ?)',
+    const { rows } = await pool.query(
+      'INSERT INTO contacts (name, email, subject, message) VALUES ($1,$2,$3,$4) RETURNING id',
       [name, email, subject || 'General Inquiry', message]
     );
     res.status(201).json({
       success: true,
-      message: 'Message received! I will get back to you soon.',
-      id: result.insertId
+      message: "Message received! I'll get back to you soon.",
+      id: rows[0].id
     });
   } catch (err) {
     console.error('DB Error (contact):', err.message);
@@ -29,10 +29,10 @@ const submitContact = async (req, res) => {
   }
 };
 
-// GET /api/contact (admin - get all messages)
+// GET /api/contact
 const getContacts = async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM contacts ORDER BY created_at DESC');
+    const { rows } = await pool.query('SELECT * FROM contacts ORDER BY created_at DESC');
     res.json(rows);
   } catch (err) {
     console.error('DB Error (getContacts):', err.message);
