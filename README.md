@@ -45,7 +45,7 @@ Render URL milne ke baad **har HTML file** mein yeh line update karo:
 
 ```javascript
 // Yeh line har .html file mein hai
-const API_BASE = 'https://YOUR-APP-NAME.onrender.com/api';
+const API_BASE = 'https://ahmad-portfolio-api.onrender.com/api';
 //                         ↑ apna actual Render URL daalo
 ```
 
@@ -53,7 +53,7 @@ Files: `index.html`, `projects.html`, `comments.html`, `contact.html`
 
 Aur `frontend/_redirects` mein bhi:
 ```
-/api/*  https://YOUR-APP-NAME.onrender.com/api/:splat  200
+/api/*  https://ahmad-portfolio-api.onrender.com/api/:splat  200
 ```
 
 ---
@@ -74,7 +74,7 @@ Aur `frontend/_redirects` mein bhi:
 ## STEP 5 — Test karo
 
 Browser mein open karo:
-- `https://YOUR-APP-NAME.onrender.com/api/health` → `{"status":"OK"}` aana chahiye
+- `https://ahmad-portfolio-api.onrender.com/api/health` → `{"status":"OK"}` aana chahiye
 - `https://your-portfolio.pages.dev` → frontend kaam karna chahiye
 
 ---

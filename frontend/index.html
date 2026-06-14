@@ -44,20 +44,13 @@
                 <button class="card card-about" onclick="location.href='about.html'">
                     <i class="fas fa-user"></i>
                     <h3>ABOUT ME</h3>
-                    <p>Resume</p>
                 </button>
                 <button class="card card-my-works" onclick="location.href='projects.html'">
                     <i class="fas fa-briefcase"></i>
                     <h3>MY WORKS</h3>
-                    <p>Projects</p>
-                </button>
-                <button class="card card-stats-1" id="likeCard" onclick="sendLike()" title="Click to like!" aria-label="Like this portfolio">
-                    <i class="fas fa-thumbs-up" id="likeIcon"></i>
-                    <span id="likeCount">0</span>
                 </button>
                 <button class="card card-stats-3" onclick="location.href='comments.html'" aria-label="View comments">
                     <i class="fas fa-users"></i>
-                    <span>0</span>
                 </button>
             </div>
             <div class="grid-cards lets-talk-row">
@@ -74,7 +67,7 @@
             document.querySelector('.nav').classList.toggle('active');
         });
 
-        const API_BASE = 'https://YOUR-APP-NAME.onrender.com/api';
+        const API_BASE = 'https://ahmad-portfolio-api.onrender.com/api';
         const likeCountEl = document.getElementById('likeCount');
         const likeCard = document.getElementById('likeCard');
         const LIKE_STORAGE_KEY = 'portfolio_liked';

@@ -1,5 +1,5 @@
 # API calls Render backend pe forward karo
-/api/*  https://YOUR-APP-NAME.onrender.com/api/:splat  200
+/api/*  https://ahmad-portfolio-api.onrender.com/api/:splat  200
 
 # SPA fallback
 /*  /index.html  200
