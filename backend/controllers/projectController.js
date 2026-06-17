@@ -43,6 +43,8 @@ const addProject = async (req, res) => {
         title, description,
         JSON.stringify(tags   || []),
         JSON.stringify(images || []),
+        title || 'Job Potal & Combined CV Generator',
+        description || 'A fully responsive job portal built with Node.js, TiDB Cloud, Firebase Authentication, and Cloudflare Pages — featuring Job Seeker and Employer dashboards with an integrated CV generator.',
         category || 'frontend',
         icon     || 'fas fa-code',
         github   || '#',
