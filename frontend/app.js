@@ -262,9 +262,9 @@ function initProjects() {
         const badge = project.featured ? `<span class="featured-badge">Featured</span>` : '';
         const slides = images.map((src, idx) => `<img src="${src}" class="project-slide${idx === 0 ? ' active' : ''}" alt="${project.title} screenshot ${idx + 1}" loading="lazy" style="width:100%;height:100%;object-fit:cover;${idx === 0 ? 'position:relative;' : 'position:absolute;top:0;left:0;'}opacity:${idx === 0 ? '1' : '0'};transition:opacity .7s ease;" />`).join('');
         const dots = images.length > 1 ? `<div class="project-slider-dots">${images.map((_, idx) => `<span class="project-slider-dot${idx === 0 ? ' active' : ''}"></span>`).join('')}</div>` : '';
-        thumbInner = `${badge}<div class="project-slider" style="position:relative;width:100%;height:220px;">${slides}</div>${dots}`;
+        thumbInner = `${badge}<div class="project-slider" style="position:relative;width:100%;height:280px;">${slides}</div>${dots}`;
       } else {
-        thumbInner = `<div style="display:flex;align-items:center;justify-content:center;height:220px;font-size:3em;color:var(--accent);"><i class="${project.icon || 'fas fa-code'}"></i></div>`;
+        thumbInner = `<div style="display:flex;align-items:center;justify-content:center;height:280px;font-size:3em;color:var(--accent);"><i class="${project.icon || 'fas fa-code'}"></i></div>`;
       }
 
       card.innerHTML = `
@@ -596,6 +596,31 @@ function initHeroLetterRain() {
     const fallDist = Math.round(rect.top + navH * 0.5);
     h1.style.setProperty('--rf-fall', `${-Math.max(fallDist, 120)}px`);
     h1.classList.add('rf-ready');
+
+    // After the longest drop-in finishes (~0.08 + charCount*0.038 + 0.72s),
+    // start the continuous random micro-blink on hero chars.
+    const chars = Array.from(h1.querySelectorAll('.rf-char'));
+    if (!chars.length) return;
+    const lastDelay = (0.08 + (chars.length - 1) * 0.038 + 0.72) * 1000;
+
+    function scheduleBlink() {
+      // Pick 1-3 random chars, stagger their blinks slightly
+      const count = Math.floor(Math.random() * 3) + 1;
+      const shuffled = [...chars].sort(() => Math.random() - 0.5).slice(0, count);
+      shuffled.forEach((ch, i) => {
+        setTimeout(() => {
+          ch.classList.remove('blink-active');
+          // Force reflow so re-adding the class restarts the animation
+          void ch.offsetWidth;
+          ch.classList.add('blink-active');
+          ch.addEventListener('animationend', () => ch.classList.remove('blink-active'), { once: true });
+        }, i * (120 + Math.random() * 180));
+      });
+      // Next blink cluster: 1.8s–4.5s from now, fully random
+      setTimeout(scheduleBlink, 1800 + Math.random() * 2700);
+    }
+
+    setTimeout(scheduleBlink, lastDelay + 300);
   });
 }
 
