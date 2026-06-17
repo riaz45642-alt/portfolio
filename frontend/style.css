@@ -80,6 +80,7 @@ body {
 }
 
 img, svg, video { max-width: 100%; height: auto; display: block; }
+.project-thumb .project-slider img { max-width: none; height: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; cursor: pointer; }
 ul { list-style: none; }
@@ -467,7 +468,7 @@ ul { list-style: none; }
 .filter-btn:hover { color: var(--text); border-color: var(--border-strong); }
 .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #1A1C18; }
 
-.projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 26px; }
+.projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
 /* ── Project card: image-first, info on hover ─────────────────── */
 .project-card {
   background: var(--surface);
@@ -488,7 +489,15 @@ ul { list-style: none; }
   background: linear-gradient(135deg, var(--surface), var(--surface-2));
 }
 .project-thumb img { transition: transform .55s var(--ease); }
-.project-card:hover .project-thumb img.active { transform: scale(1.07); }
+.project-thumb .project-slider { overflow: hidden; }
+.project-thumb .project-slider img.project-slide {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #1A1C18;
+}
+.project-card:hover .project-thumb img.active { transform: scale(1.04); }
 
 .project-slider-dots {
   position: absolute; bottom: 12px; left: 50%;
@@ -658,14 +667,29 @@ ul { list-style: none; }
 #contact .form-group { margin-bottom: 26px; }
 #contact .form-group label { font-size: 10px; }
 #contact .form-group input,
-#contact .form-group select,
 #contact .form-group textarea {
   background: transparent; border: none; border-bottom: 1px solid var(--border);
   border-radius: 0; padding: 10px 2px;
+  color: var(--ink-text);
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+#contact .form-group select {
+  background: #ffffff; border: none; border-bottom: 1px solid var(--border);
+  border-radius: 0; padding: 10px 2px;
+  color: #1A1C18;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+#contact .form-group select option {
+  background: #ffffff;
+  color: #1A1C18;
 }
 #contact .form-group input:focus,
 #contact .form-group select:focus,
-#contact .form-group textarea:focus { border-color: var(--accent); }
+#contact .form-group textarea:focus { border-color: var(--accent); outline: none; }
 #contact .form-group textarea { min-height: 90px; }
 
 #contact .alert.success, #contact .alert.error { border: none; }
@@ -742,6 +766,10 @@ ul { list-style: none; }
   .projects-grid, .skills-grid { grid-template-columns: 1fr; }
   .hero-tags span, .about-tags span { font-size: 11px; padding: 5px 11px; }
   .nav-logo { padding-right: 10px; font-size: 14px; }
+}
+
+@media (max-width: 768px) {
+  .projects-grid { grid-template-columns: 1fr; }
 }
 
 :focus-visible { outline: 2px solid var(--accent-dot); outline-offset: 2px; }

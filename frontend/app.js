@@ -260,9 +260,9 @@ function initProjects() {
       let thumbInner;
       if (images) {
         const badge = project.featured ? `<span class="featured-badge">Featured</span>` : '';
-        const slides = images.map((src, idx) => `<img src="${src}" class="project-slide${idx === 0 ? ' active' : ''}" alt="${project.title} screenshot ${idx + 1}" loading="lazy" style="width:100%;height:100%;object-fit:cover;${idx === 0 ? 'position:relative;' : 'position:absolute;top:0;left:0;'}opacity:${idx === 0 ? '1' : '0'};transition:opacity .7s ease;" />`).join('');
+        const slides = images.map((src, idx) => `<img src="${src}" class="project-slide${idx === 0 ? ' active' : ''}" alt="${project.title} screenshot ${idx + 1}" loading="lazy" style="width:100%;height:100%;object-fit:contain;background:#1A1C18;${idx === 0 ? 'position:relative;' : 'position:absolute;top:0;left:0;'}opacity:${idx === 0 ? '1' : '0'};transition:opacity .7s ease;" />`).join('');
         const dots = images.length > 1 ? `<div class="project-slider-dots">${images.map((_, idx) => `<span class="project-slider-dot${idx === 0 ? ' active' : ''}"></span>`).join('')}</div>` : '';
-        thumbInner = `${badge}<div class="project-slider" style="position:relative;width:100%;height:280px;">${slides}</div>${dots}`;
+        thumbInner = `${badge}<div class="project-slider" style="position:relative;width:100%;height:220px;">${slides}</div>${dots}`;
       } else {
         thumbInner = `<div style="display:flex;align-items:center;justify-content:center;height:280px;font-size:3em;color:var(--accent);"><i class="${project.icon || 'fas fa-code'}"></i></div>`;
       }
