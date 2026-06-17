@@ -21,6 +21,12 @@ CREATE TABLE IF NOT EXISTS projects (
 -- Seed projects
 INSERT INTO projects (title, description, tags, images, category, icon, github, demo, featured) VALUES
 (
+  'Job Portal & CV Generator',
+  'A fully responsive job portal built with Node.js, TiDB Cloud, Firebase Authentication',
+    '["Node.js", "TiDB Cloud", "Firebase Authentication", "Cloudflare Pages"]',
+    '["https://res.cloudinary.com/dzj6dhnqe/image/upload/v1700000000/portfolio/job-portal-1.png", "https://res.cloudinary.com/dzj6dhnqe/image/upload/v1700000000/portfolio/job-portal-2.png"]',
+  'frontend',
+  'fas fa-briefcase',
   'https://github.com/riaz45642-alt',
   'https://talentbridge-2o9.pages.dev',
   TRUE
