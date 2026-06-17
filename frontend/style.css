@@ -373,9 +373,9 @@ ul { list-style: none; }
 
 @media (prefers-reduced-motion: no-preference) {
   .stair-line { animation: fadeUp .10s var(--ease) both; }
-  .stair-line-1 { animation-delay: .8s; }
-  .stair-line-2 { animation-delay: .11s; }
-  .stair-line-3 { animation-delay: 1.4s; }
+  .stair-line-1 { animation-delay: 1s; }
+  .stair-line-2 { animation-delay: 0.5s; }
+  .stair-line-3 { animation-delay: 0.4s; }
 }
 
 /* --- hero visual / code-window removed: the hero now leads with the
