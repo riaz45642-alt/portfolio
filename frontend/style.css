@@ -763,9 +763,9 @@ ul { list-style: none; }
 .acp-photo {
   display: block;
   width: 170px;
-  height: 160px;
+  height: 200px;
   object-fit: cover;
-  object-position: center 8%;   /* pulls face into frame */
+  object-position: center 30%;   /* pulls face into frame */
   border-radius: 0;
   margin-bottom: 10px;
 }
