@@ -126,8 +126,8 @@ function initClock() {
 }
 
 /* ---------------------------------------------------------------
-   Hero code-window: status is now static — typewriter removed.
-   Function kept as no-op so any external callers don't throw.
+   Hero typewriter: removed along with the old code-window panel.
+   Function kept as a no-op so any external callers don't throw.
    --------------------------------------------------------------- */
 function initHeroTypewriter() { /* removed — static value in HTML */ }
 

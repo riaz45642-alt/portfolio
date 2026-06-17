@@ -20,7 +20,8 @@
               without putting a photo on the homepage.
    ==================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Syncopate:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pacifico&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -273,8 +274,9 @@ ul { list-style: none; }
 /* ====================================================================
    HERO
    ==================================================================== */
-.hero { min-height: 100vh; display: flex; align-items: center; padding: 144px 0 70px; }
+.hero { min-height: 100vh; display: flex; align-items: center; padding: 144px 0 70px; position: relative; }
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 50px; align-items: center; }
+.hero-grid-solo { grid-template-columns: 1fr; }
 
 .hero-copy .eyebrow { animation: fadeUp .8s var(--ease) .08s both; }
 .hero-copy h1 {
@@ -311,68 +313,94 @@ ul { list-style: none; }
   border: 1px solid var(--border); border-radius: 100px; padding: 6px 13px;
 }
 
-/* --- hero visual: a small code-editor panel stands in for a portrait,
-   keeping the personal photo strictly out of the homepage --- */
-.hero-visual { position: relative; animation: fadeUp .9s var(--ease) .2s both; }
-.code-window {
-  background: var(--ink-surface); border: 1px solid var(--ink-line);
-  border-radius: var(--radius-lg); overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0,0,0,.4);
+/* --- Stair-style hero headline: AHMAD / FRONTEND / PORTFOLIO 2026,
+   each line stepping further right, in a fragmented/segmented display
+   face so it reads as deliberately "broken" rather than a clean
+   default sans-serif. This is now the sole visual focus of the hero. --- */
+.hero-copy-stair { max-width: 100%; }
+.stair-hero {
+  font-family: "Pacifico", cursive;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1;
+  gap:1.5px;
 }
-.code-window-bar {
-  display: flex; align-items: center; gap: 7px;
-  padding: 13px 16px; border-bottom: 1px solid var(--ink-line);
-  background: var(--ink-surface-2);
+.stair-line {
+  display: block;
+  white-space: nowrap;
+  font-weight: 900;
+  letter-spacing: .06em;
+  position: relative;
 }
-.code-window-bar span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.14); }
-.code-window-bar span:nth-child(1) { background: #ff6159; opacity: .55; }
-.code-window-bar span:nth-child(2) { background: #ffbd2e; opacity: .55; }
-.code-window-bar span:nth-child(3) { background: #28c93f; opacity: .55; }
-.code-window-title {
-  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-text-faint);
-  margin-left: 8px;
+/* fragmented / cut letterform effect: a thin offset duplicate + a
+   hard clip-path slice through the glyphs, so edges read as
+   segmented rather than a smooth typeface */
+.stair-line::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: var(--accent-ink);
+  opacity: .55;
+  clip-path: polygon(0 45%, 100% 45%, 100% 58%, 0 58%);
+  transform: translate(3px, -1px);
+  pointer-events: none;
 }
-.code-window-body { padding: 24px 22px 28px; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 2; }
-.code-window-body .ln { color: var(--ink-text-faint); display: inline-block; width: 18px; user-select: none; }
-.cm { color: #6b7280; }
-.kw { color: #c792ea; }
-.va { color: #82aaff; }
-.st { color: #34e7c4; }
-/* caret/blink removed — typewriter replaced by letter rain */
+.stair-line-1 {
+  font-family: "Pacifico", cursive;
+  font-size: clamp(54px, 10vw, 118px);
+  margin-left: 0;
+  color: var(--ink-text);
+}
+.stair-line-2 {
+  font-family: "Pacifico", cursive;
+  font-size: clamp(40px, 7.4vw, 86px);
+  margin-left: clamp(28px, 6vw, 90px);
+  margin-top: .08em;
+  color: var(--ink-text-dim);
+}
+.stair-line-3 {
+  font-size: clamp(24px, 4.4vw, 50px);
+  margin-left: clamp(56px, 12vw, 180px);
+  margin-top: .12em;
+  font-family: "Pacifico", cursive;
+  font-weight: 600;
+  letter-spacing: .15em;
+  color: var(--accent-ink);
+}
+.stair-line-3::before { display: none; }
 
-.hero-floatcard {
-  position: relative; margin: -22px 0 0 auto; width: 230px;
-  background: rgba(234,231,220,.92);
-  border: 1px solid rgba(26,28,24,.08);
-  border-radius: var(--radius-md);
-  padding: 18px 20px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 18px 40px rgba(0,0,0,.35);
-  color: #1A1C18;
-  animation: fadeUp .9s var(--ease) .5s both;
+@media (prefers-reduced-motion: no-preference) {
+  .stair-line { animation: fadeUp .10s var(--ease) both; }
+  .stair-line-1 { animation-delay: .8s; }
+  .stair-line-2 { animation-delay: .11s; }
+  .stair-line-3 { animation-delay: 1.4s; }
 }
-.hero-floatcard .status-row { display: flex; align-items: center; gap: 7px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--accent-paper); margin-bottom: 12px; }
-.hero-floatcard a {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 13.5px; font-weight: 500; padding: 10px 0;
-  border-top: 1px solid rgba(26,28,24,.1);
-  transition: color .2s, gap .2s;
+
+/* --- hero visual / code-window removed: the hero now leads with the
+   stair-style headline only (see .stair-hero above). --- */
+
+/* --- Like button: moved to the hero's extreme corner, small and
+   minimal so it never competes with the stair headline --- */
+.hero-like-corner {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 5;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(234,231,220,.08);
+  border: 1px solid rgba(234,231,220,.16);
+  border-radius: 100px;
+  padding: 7px 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-text-dim);
+  backdrop-filter: blur(10px);
+  transition: border-color .2s, color .2s, transform .2s;
+  animation: fadeUp .9s var(--ease) .3s both;
 }
-.hero-floatcard a:first-of-type { border-top: none; padding-top: 0; }
-.hero-floatcard a:hover { color: var(--accent-paper); }
-.hero-floatcard a i:last-child { font-size: 11px; color: #8a8d99; transition: transform .2s, color .2s; }
-.hero-floatcard a:hover i:last-child { color: var(--accent-paper); transform: translate(2px,-2px); }
-.hero-floatcard .hero-like {
-  width: 100%; margin-top: 12px; justify-content: center;
-  background: rgba(26,28,24,.05); border: 1px solid rgba(26,28,24,.1);
-  border-radius: 100px; padding: 9px 14px;
-  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5c6354;
-  display: flex; align-items: center; gap: 8px;
-  transition: border-color .2s, color .2s;
-}
-.hero-like:hover { border-color: var(--accent-paper); color: #1A1C18; }
-.hero-like.liked { color: var(--accent-paper); border-color: var(--accent-paper); }
-.hero-like i { color: #d2495f; }
+.hero-like-corner:hover { border-color: var(--accent-ink); color: var(--ink-text); transform: translateY(-1px); }
+.hero-like-corner.liked { color: var(--accent-ink); border-color: var(--accent-ink); }
+.hero-like-corner i { color: #d2495f; font-size: 11px; }
 .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-dot); box-shadow: 0 0 0 0 rgba(201,162,39,.6); animation: pulse 2.2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(201,162,39,.55); } 70% { box-shadow: 0 0 0 8px rgba(201,162,39,0); } 100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); } }
 
@@ -574,7 +602,6 @@ ul { list-style: none; }
   .hero-grid, .about-grid, .feedback-layout, .contact-layout { grid-template-columns: 1fr; }
   .about-stats { grid-template-columns: 1fr; }
   .hero { min-height: auto; align-items: flex-start; padding: 110px 0 60px; }
-  .hero-visual { max-width: 420px; margin: 60px auto 0; }
   .section { padding: 96px 0 60px; }
 }
 
@@ -598,7 +625,9 @@ ul { list-style: none; }
   .nav-toggle { display: flex; }
   .nav-cta { margin: 4px 0 0; }
 
-  .hero-floatcard { width: 100%; margin-top: -22px; }
+  .hero-like-corner { top: 16px; right: 16px; padding: 6px 10px; font-size: 10.5px; }
+  .stair-line-2 { margin-left: clamp(16px, 10vw, 40px); }
+  .stair-line-3 { margin-left: clamp(24px, 16vw, 70px); }
   .form-row { grid-template-columns: 1fr 1fr; }
   .statusbar-inner { flex-direction: column; align-items: flex-start; }
   .hero-actions { flex-direction: column; }

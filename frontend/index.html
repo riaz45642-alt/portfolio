@@ -15,7 +15,6 @@
 
 <nav class="nav-wrap">
   <div class="nav-pill">
-    <div class="nav-logo">ahmad<span>.</span></div>
     <div class="nav-links">
       <a href="#home">Home</a>
       <a href="#about" class="nav-about-link" id="navAboutBtn">About
@@ -40,38 +39,22 @@
 
   <!-- ============ HOME / HERO ============ -->
   <section id="home" class="hero section theme-dark">
-    <div class="container hero-grid">
+    <div class="container hero-grid hero-grid-solo">
 
-      <div class="hero-copy">
+      <div class="hero-copy hero-copy-stair">
         <div class="eyebrow">home</div>
-        <h1 class="letter-fall-hero">Interfaces that feel <span class="accent">considered</span>, not assembled.</h1>
-        <p class="lead">Frontend developer based in Sheikhupura, Pakistan — currently open to freelance and full‑time work.</p>
-        <div class="hero-actions">
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="code-window">
-          <div class="code-window-bar">
-            <span></span><span></span><span></span>
-            <div class="code-window-title">about-me.js</div>
-          </div>
-          <div class="code-window-body">
-            <div><span class="cm">// currently</span></div>
-            <div><span class="kw">const</span> <span class="va">role</span> = <span class="st">"Frontend Developer"</span>;</div>
-            <div><span class="kw">const</span> <span class="va">focus</span> = [<span class="st">"perf"</span>, <span class="st">"clean UI"</span>, <span class="st">"a11y"</span>];</div>
-            <div><span class="kw">const</span> <span class="va">status</span> = <span class="st">"open to work"</span>;</div>
-          </div>
-        </div>
-
-        <div class="hero-floatcard">
-          <div class="status-row"><span class="dot-live"></span> open to work</div>
-          <a href="#about"><span>About me</span> <i class="fas fa-arrow-right"></i></a>
-          <button id="likeCard" class="hero-like"><i class="fas fa-heart"></i> <span id="likeCount">0</span> likes</button>
-        </div>
+        <h1 class="stair-hero letter-fall-hero" aria-label="Ahmad, Frontend, Portfolio 2026">
+          <span class="stair-line stair-line-1" data-text="AHMAD">Ahmad</span>
+          <span class="stair-line stair-line-2" data-text="FRONTEND">FRONTEND</span>
+          <span class="stair-line stair-line-3" data-text="PORTFOLIO 2026">PORTFOLIO</span>
+        </h1>
       </div>
 
     </div>
+
+    <button id="likeCard" class="hero-like hero-like-corner" aria-label="Like this portfolio">
+      <i class="fas fa-heart"></i> <span id="likeCount">0</span>
+    </button>
   </section>
 
   <!-- ============ ABOUT ============ -->
