@@ -637,9 +637,9 @@ ul { list-style: none; }
 .about-preview img {
   display: block;
   width: 68px;
-  height: 80px;
+  height: 84px;
   object-fit: cover;
-  object-position: center top;
+  object-position: center 15%;
   border-radius: 10px;
   border: 2px solid rgba(255,255,255,.18);
   box-shadow: 0 8px 24px rgba(0,0,0,.28);

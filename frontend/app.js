@@ -447,9 +447,8 @@ function initComments() {
   };
 
   document.getElementById('submitCommentBtn')?.addEventListener('click', async () => {
-    const name = document.getElementById('commentName').value.trim();
-    const company = document.getElementById('commentCompany').value.trim();
-    const email = document.getElementById('commentEmail').value.trim();
+    const name    = document.getElementById('commentName').value.trim();
+    const email   = document.getElementById('commentEmail').value.trim();
     const message = document.getElementById('commentMessage').value.trim();
     if (!name || !email || !message) return showAlert('error', 'Please fill in your name, email, and comment.');
 
@@ -457,18 +456,18 @@ function initComments() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
     try {
-      const res = await fetch(`${API_BASE}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, company, email, message }) });
+      const res = await fetch(`${API_BASE}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, message }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
       allComments.unshift(data.comment);
       renderComments();
       showAlert('success');
-      ['commentName', 'commentCompany', 'commentEmail', 'commentMessage'].forEach((id) => { document.getElementById(id).value = ''; });
+      ['commentName', 'commentEmail', 'commentMessage'].forEach((id) => { document.getElementById(id).value = ''; });
     } catch (err) {
       showAlert('error', err.message || 'Could not post your comment.');
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Comment';
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post comment';
     }
   });
 
