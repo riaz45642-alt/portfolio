@@ -1,109 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhammad Ahmad - Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style1.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Ahmad — Frontend Developer</title>
+<meta name="description" content="Portfolio of Muhammad Ahmad, a frontend developer building clean, fast, user-friendly web experiences.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="nav">
-                <h3><span>A</span>HM<span>A</span>D</h3>
-            </div>
-        </nav>
-    </header>
 
-    <main class="container">
-        <section class="hero-section">
-            <div class="hero-content">
-                <div class="profile-card">
-                    <div class="profile-pic-wrap">
-                        <img src="picture.jfif" alt="Muhammad Ahmad" class="profile-pic">
-                    </div>
-                    <div class="profile-info">
-                        <span class="designation">A Frontend Developer</span>
-                        <h3>Muhammad Ahmad</h3>
-                        <p>An ambitious creative professional</p>
-                    </div>
-                </div>
-                <div class="intro-text">
-                    <h2>Check out our latest design trends and projects</h2>
-                    <p>
-                        Explore my creative journey through diverse projects, where design meets innovation. Each piece reflects a commitment to aesthetics and functionality.
-                    </p>
-                </div>
-            </div>
-            <div class="grid-cards">
-                <button class="card card-about" onclick="location.href='about.html'">
-                    <i class="fas fa-user"></i>
-                    <h3>ABOUT ME</h3>
-                </button>
-                <button class="card card-my-works" onclick="location.href='projects.html'">
-                    <i class="fas fa-briefcase"></i>
-                    <h3>MY WORKS</h3>
-                </button>
-                <button class="card card-stats-3" onclick="location.href='comments.html'" aria-label="View comments">
-                    <i class="fas fa-users"></i>
-                </button>
-            </div>
-            <div class="grid-cards lets-talk-row">
-                <button class="card card-lets-talk" onclick="location.href='contact.html'">
-                    <span>Let's</span>
-                    <span>Talk</span>
-                </button>
-            </div>
-        </section>
-    </main>
+<div class="bg-field"></div>
+<div class="bg-grid"></div>
 
-    <script>
-        document.querySelector('.menu-toggle').addEventListener('click', () => {
-            document.querySelector('.nav').classList.toggle('active');
-        });
+<nav class="nav-wrap">
+  <div class="nav-pill">
+    <div class="nav-logo">ahmad<span>.</span></div>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Work</a>
+      <a href="#feedback">Feedback</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a class="nav-cta" href="assets/Ahmad(2).pdf" target="_blank" rel="noopener">resume ↓</a>
+    <button class="nav-toggle" aria-label="Toggle menu"><span></span></button>
+  </div>
+</nav>
 
-        const API_BASE = 'https://ahmad-portfolio-api.onrender.com/api';
-        const likeCountEl = document.getElementById('likeCount');
-        const likeCard = document.getElementById('likeCard');
-        const LIKE_STORAGE_KEY = 'portfolio_liked';
+<main>
 
-        async function loadLikes() {
-            try {
-                const res = await fetch(`${API_BASE}/likes`);
-                if (!res.ok) throw new Error('API not available');
-                const data = await res.json();
-                likeCountEl.textContent = data.total;
-            } catch {
-                likeCountEl.textContent = '0';
-            }
-            if (localStorage.getItem(LIKE_STORAGE_KEY) === 'true') {
-                likeCard.classList.add('liked');
-            }
-        }
+  <!-- ============ HOME / HERO ============ -->
+  <section id="home" class="hero section theme-dark">
+    <div class="container hero-grid">
 
-        async function sendLike() {
-            if (localStorage.getItem(LIKE_STORAGE_KEY) === 'true') {
-                likeCard.classList.add('liked');
-                return;
-            }
-            likeCard.classList.add('liked');
-            const current = parseInt(likeCountEl.textContent, 10) || 0;
-            likeCountEl.textContent = current + 1; // optimistic update
+      <div class="hero-copy">
+        <div class="eyebrow">whoami</div>
+        <h1>Interfaces that feel <span class="accent">considered</span>, not assembled.</h1>
+        <p class="lead">Frontend developer based in Sheikhupura, Pakistan — currently open to freelance and full‑time work.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#projects"><i class="fas fa-arrow-right"></i> View work</a>
+          <a class="btn btn-ghost" href="#contact"><i class="fas fa-comment-dots"></i> Let's talk</a>
+        </div>
+        <div class="hero-tags">
+          <span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Node.js</span><span>Firebase</span><span>Git</span>
+        </div>
+      </div>
 
-            try {
-                const res = await fetch(`${API_BASE}/likes`, { method: 'POST' });
-                if (!res.ok) throw new Error('API not available');
-                const data = await res.json();
-                likeCountEl.textContent = data.total;
-                localStorage.setItem(LIKE_STORAGE_KEY, 'true');
-            } catch {
-                localStorage.setItem(LIKE_STORAGE_KEY, 'true');
-            }
-        }
+      <div class="hero-visual">
+        <div class="code-window">
+          <div class="code-window-bar">
+            <span></span><span></span><span></span>
+            <div class="code-window-title">about-me.js</div>
+          </div>
+          <div class="code-window-body">
+            <div><span class="cm">// currently</span></div>
+            <div><span class="kw">const</span> <span class="va">role</span> = <span class="st">"Frontend Developer"</span>;</div>
+            <div><span class="kw">const</span> <span class="va">focus</span> = [<span class="st">"perf"</span>, <span class="st">"clean UI"</span>, <span class="st">"a11y"</span>];</div>
+            <div><span class="kw">const</span> <span class="va">status</span> = <span id="heroTypewriter" class="st"></span><span class="caret">&nbsp;</span></div>
+          </div>
+        </div>
 
-        loadLikes();
-    </script>
+        <div class="hero-floatcard">
+          <div class="status-row"><span class="dot-live"></span> open to work</div>
+          <a href="#about"><span>About me</span> <i class="fas fa-arrow-right"></i></a>
+          <a href="https://www.linkedin.com/in/ahmad-riaz-785636359/" target="_blank" rel="noopener"><span>LinkedIn</span> <i class="fas fa-arrow-up-right-from-square"></i></a>
+          <button id="likeCard" class="hero-like"><i class="fas fa-heart"></i> <span id="likeCount">0</span> likes</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about" class="section theme-light">
+    <div class="container">
+      <div class="section-head scroll-reveal">
+        <div>
+          <div class="eyebrow">about</div>
+          <h2 class="section-title">Who I am</h2>
+          <p class="section-sub">A short summary of what I work on, how I think, and where to find me.</p>
+        </div>
+      </div>
+
+      <p class="about-body-lead scroll-reveal" style="max-width:680px;color:var(--text-dim);font-size:15.5px;margin-bottom:8px">
+        I'm Muhammad Ahmad, a frontend developer focused on clean, fast, user‑friendly web experiences — built with modern tools and close attention to performance and the details people feel even if they never notice them.
+      </p>
+      <div class="about-tags scroll-reveal">
+        <span>Frontend Development</span><span>UI / UX</span><span>Performance</span><span>Accessibility</span><span>Git &amp; GitHub</span>
+      </div>
+
+      <div class="about-stats stagger scroll-reveal" data-reveal="scale">
+        <div class="about-stat">
+          <div class="num"><span id="statProjects" class="accent">—</span></div>
+          <div class="lbl">Projects shipped</div>
+        </div>
+        <div class="about-stat">
+          <div class="num"><span id="statStack" class="accent">—</span></div>
+          <div class="lbl">Tools in the stack</div>
+        </div>
+        <div class="about-stat">
+          <div class="num"><span id="statAvailability" class="accent">—</span></div>
+          <div class="lbl">Availability</div>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-card scroll-reveal" data-reveal="left">
+          <img src="picture.jfif" alt="Muhammad Ahmad">
+          <h2>Muhammad Ahmad</h2>
+          <span class="role">Frontend Developer</span>
+          <div class="social-row">
+            <a class="gh" href="https://github.com/riaz45642-alt" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+            <a class="li" href="https://www.linkedin.com/in/ahmad-riaz-785636359/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a class="ig" href="https://www.instagram.com/_amd_9_27/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="about-body scroll-reveal" data-reveal="right">
+          <div class="info-grid">
+            <div class="info-item"><span>Name</span><span>Muhammad Ahmad</span></div>
+            <div class="info-item"><span>Role</span><span>Frontend Developer</span></div>
+            <div class="info-item"><span>Location</span><span>Sheikhupura, Pakistan</span></div>
+            <div class="info-item"><span>Experience</span><span>3+ Projects</span></div>
+            <div class="info-item"><span>Availability</span><span>Open to work</span></div>
+            <div class="info-item"><span>Email</span><span>ahmad.r.27@gmail.com</span></div>
+          </div>
+
+          <a href="assets/Ahmad(2).pdf" target="_blank" rel="noopener" class="btn-download"><i class="fas fa-file-pdf"></i> View résumé</a>
+        </div>
+      </div>
+
+      <div class="eyebrow scroll-reveal" style="margin-top:64px">stack</div>
+      <h3 class="section-title scroll-reveal" style="font-size:24px;margin-bottom:28px">Tools I reach for</h3>
+      <div class="skills-grid stagger" id="skillsGrid">
+        <div class="loading-spinner"><i class="fas fa-spinner"></i> Loading skills…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS / WORK ============ -->
+  <section id="projects" class="section theme-dark">
+    <div class="container">
+      <div class="section-head scroll-reveal">
+        <div>
+          <div class="eyebrow">work</div>
+          <h2 class="section-title">Selected work</h2>
+          <p class="section-sub">Things I've built end to end — from interface to API.</p>
+        </div>
+      </div>
+
+      <div class="projects-filter scroll-reveal">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="frontend">Frontend</button>
+        <button class="filter-btn" data-filter="fullstack">Full stack</button>
+      </div>
+
+      <div class="projects-grid" id="projectsGrid">
+        <div class="loading-spinner"><i class="fas fa-spinner"></i> Loading projects…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEEDBACK / COMMENTS ============ -->
+  <section id="feedback" class="section theme-light">
+    <div class="container">
+      <div class="section-head scroll-reveal">
+        <div>
+          <div class="eyebrow">feedback</div>
+          <h2 class="section-title">Feedback &amp; comments</h2>
+          <p class="section-sub">Share your thoughts, feedback, or just say hello.</p>
+        </div>
+      </div>
+
+      <div class="feedback-layout">
+        <div class="card-panel scroll-reveal" data-reveal="left">
+          <h2>Leave a comment</h2>
+          <div class="alert success" id="alertSuccess"><i class="fas fa-check-circle"></i> Posted successfully.</div>
+          <div class="alert error" id="alertError"><i class="fas fa-exclamation-circle"></i> <span id="errorText">Something went wrong.</span></div>
+
+          <div class="form-row">
+            <div class="form-group"><label>Name *</label><input type="text" id="commentName" placeholder="Your name"></div>
+            <div class="form-group"><label>Company</label><input type="text" id="commentCompany" placeholder="Optional"></div>
+          </div>
+          <div class="form-group"><label>Email *</label><input type="email" id="commentEmail" placeholder="you@example.com"></div>
+          <div class="form-group"><label>Comment *</label><textarea id="commentMessage" placeholder="Write your comment or feedback..."></textarea></div>
+          <button class="btn-submit" id="submitCommentBtn"><i class="fas fa-paper-plane"></i> Post comment</button>
+        </div>
+
+        <div class="comments-list scroll-reveal" id="commentsList" data-reveal="right">
+          <div class="loading-spinner"><i class="fas fa-spinner"></i> Loading comments…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="section theme-dark">
+    <div class="container">
+      <div class="section-head scroll-reveal">
+        <div>
+          <div class="eyebrow">contact</div>
+          <h2 class="section-title">Get in touch</h2>
+          <p class="section-sub">Have a project in mind? Let's work on it together.</p>
+        </div>
+      </div>
+
+      <div class="contact-layout">
+        <div class="card-panel contact-info-card scroll-reveal" data-reveal="left">
+          <h2>Let's talk</h2>
+          <p>I'm currently available for freelance and full-time work. Feel free to reach out.</p>
+
+          <div class="contact-item">
+            <div class="icon"><i class="fab fa-whatsapp"></i></div>
+            <div class="details"><span>WhatsApp</span><span><a href="https://wa.me/923234567863" target="_blank" rel="noopener">+92 323 4567863</a></span></div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-envelope"></i></div>
+            <div class="details"><span>Email</span><span><a href="mailto:ahmad.r.27@gmail.com">ahmad.r.27@gmail.com</a></span></div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-phone"></i></div>
+            <div class="details"><span>Phone</span><span>+92 323 4567863</span></div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="details"><span>Location</span><span>Sheikhupura, Pakistan</span></div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-clock"></i></div>
+            <div class="details"><span>Availability</span><span>Mon – Sat</span></div>
+          </div>
+
+          <div class="social-row" style="justify-content:flex-start;margin-top:24px">
+            <a class="wa" href="https://wa.me/923234567863" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a class="gh" href="https://github.com/riaz45642-alt" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+            <a class="li" href="https://www.linkedin.com/in/ahmad-riaz-785636359/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a class="ig" href="https://www.instagram.com/_amd_9_27/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="card-panel scroll-reveal" data-reveal="right">
+          <h2>Send a message</h2>
+          <div class="alert success" id="contactAlertSuccess"><i class="fas fa-check-circle"></i> Opening WhatsApp with your message…</div>
+          <div class="alert error" id="contactAlertError"><i class="fas fa-exclamation-circle"></i> Please fill in your name, email, and message.</div>
+
+          <div class="form-row">
+            <div class="form-group"><label>First name</label><input type="text" id="firstName"></div>
+            <div class="form-group"><label>Last name</label><input type="text" id="lastName"></div>
+          </div>
+          <div class="form-group"><label>Email address</label><input type="email" id="email"></div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="subject">
+              <option value="">Select a subject…</option>
+              <option value="freelance">Freelance project</option>
+              <option value="fulltime">Full-time opportunity</option>
+              <option value="collaboration">Collaboration</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Message</label><textarea id="message" placeholder="Tell me about your project or idea..."></textarea></div>
+          <button class="btn-submit" id="contactSubmitBtn"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="statusbar theme-dark">
+  <div class="container statusbar-inner">
+    <div class="statusbar-left">
+      <span class="statusbar-item"><i class="fas fa-code-branch branch"></i> main</span>
+      <span class="statusbar-item"><i class="fas fa-map-marker-alt"></i> Sheikhupura, PK</span>
+      <span class="statusbar-item"><span class="dot-live"></span> open to work</span>
+    </div>
+    <div class="statusbar-right">
+      <span class="statusbar-item"><i class="fas fa-clock"></i> <span id="statusTime">--:--</span></span>
+      <span class="statusbar-item"><span id="statusDate">--/--/----</span></span>
+      <div class="social-row">
+        <a class="wa" href="https://wa.me/923234567863" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <a class="gh" href="https://github.com/riaz45642-alt" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+        <a class="li" href="https://www.linkedin.com/in/ahmad-riaz-785636359/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a class="ig" href="https://www.instagram.com/_amd_9_27/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+      <span>© 2026 Ahmad</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
 </body>
 </html>

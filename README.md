@@ -41,15 +41,14 @@ portfolio-main/
 
 ## STEP 3 — Frontend mein Render URL daalo
 
-Render URL milne ke baad **har HTML file** mein yeh line update karo:
+Render URL milne ke baad **`frontend/app.js`** ke top par yeh line update karo:
 
 ```javascript
-// Yeh line har .html file mein hai
 const API_BASE = 'https://ahmad-portfolio-api.onrender.com/api';
 //                         ↑ apna actual Render URL daalo
 ```
 
-Files: `index.html`, `projects.html`, `comments.html`, `contact.html`
+The site is a single-page app now — `app.js` is the only file with `API_BASE` in it (`index.html` has all the sections; `about.html` / `projects.html` / `comments.html` / `contact.html` just redirect into `index.html#section` for old bookmarks/links).
 
 Aur `frontend/_redirects` mein bhi:
 ```
