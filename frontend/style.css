@@ -338,8 +338,7 @@ ul { list-style: none; }
 .kw { color: #c792ea; }
 .va { color: #82aaff; }
 .st { color: #34e7c4; }
-.caret { display: inline-block; width: 2px; background: var(--accent-ink); animation: blink 1s step-end infinite; margin-left: 1px; }
-@keyframes blink { 50% { opacity: 0; } }
+/* caret/blink removed — typewriter replaced by letter rain */
 
 .hero-floatcard {
   position: relative; margin: -22px 0 0 auto; width: 230px;
@@ -618,3 +617,86 @@ ul { list-style: none; }
 }
 
 :focus-visible { outline: 2px solid var(--accent-dot); outline-offset: 2px; }
+
+/* ====================================================================
+   ABOUT NAV HOVER — profile image preview
+   ==================================================================== */
+.nav-links .nav-about-link {
+  position: relative;
+}
+.about-preview {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px) scale(0.92);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease, transform .22s ease;
+  z-index: 200;
+}
+.about-preview img {
+  display: block;
+  width: 68px;
+  height: 80px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,.18);
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+}
+.nav-links .nav-about-link:hover .about-preview {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* ====================================================================
+   LETTER RAIN — shared keyframe (hero + about paragraph)
+   --rf-fall : how far up from final position letters start  (set by JS)
+   --rf-delay: per-character stagger delay                   (set by JS)
+   ==================================================================== */
+
+/* The gravity keyframe: fast in the middle, slight overshoot, settle */
+@keyframes rainDrop {
+  0%   { opacity: 0;   transform: translateY(var(--rf-fall, -300px)); }
+  55%  { opacity: 1;   transform: translateY(6px); }
+  72%  { transform: translateY(-3px); }
+  85%  { transform: translateY(2px); }
+  100% { opacity: 1;   transform: translateY(0); }
+}
+
+/* ── Hero H1 ─────────────────────────────────────────────────────── */
+/* Before JS fires, keep h1 invisible to avoid flash */
+.letter-fall-hero { visibility: hidden; }
+.letter-fall-hero.rf-ready { visibility: visible; }
+
+.letter-fall-hero .rf-char {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.letter-fall-hero.rf-ready .rf-char {
+  animation: rainDrop 0.72s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--rf-delay, 0s);
+}
+.letter-fall-hero .rf-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+/* ── About paragraph ─────────────────────────────────────────────── */
+.letter-fall-scroll .rf-char {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.letter-fall-scroll.rf-ready .rf-char {
+  animation: rainDrop 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--rf-delay, 0s);
+}
+.letter-fall-scroll .rf-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+/* Legacy aliases — keep old class names harmless */
+.lf-char, .lf-space, .lf-active .lf-char { /* no-op */ }

@@ -126,37 +126,10 @@ function initClock() {
 }
 
 /* ---------------------------------------------------------------
-   Hero code-window: small typewriter cycling a few honest status
-   lines. Purely decorative, no API calls, easy on performance.
+   Hero code-window: status is now static — typewriter removed.
+   Function kept as no-op so any external callers don't throw.
    --------------------------------------------------------------- */
-function initHeroTypewriter() {
-  const el = document.getElementById('heroTypewriter');
-  if (!el) return;
-  const lines = ['"open to work"', '"shipping TalentBridge"', '"learning by building"'];
-  let lineIndex = 0, charIndex = 0, deleting = false;
-
-  function step() {
-    const current = lines[lineIndex];
-    if (!deleting) {
-      charIndex++;
-      el.textContent = current.slice(0, charIndex);
-      if (charIndex === current.length) {
-        deleting = true;
-        setTimeout(step, 1800);
-        return;
-      }
-    } else {
-      charIndex--;
-      el.textContent = current.slice(0, charIndex);
-      if (charIndex === 0) {
-        deleting = false;
-        lineIndex = (lineIndex + 1) % lines.length;
-      }
-    }
-    setTimeout(step, deleting ? 35 : 55);
-  }
-  step();
-}
+function initHeroTypewriter() { /* removed — static value in HTML */ }
 
 /* ---------------------------------------------------------------
    About stats: small, honest numbers pulled from data that's
@@ -558,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initClock();
   initLikes();
-  initHeroTypewriter();
+  initHeroLetterRain();
   initSkills();
   initProjects();
   initComments();
@@ -566,4 +539,111 @@ document.addEventListener('DOMContentLoaded', () => {
   initSplitText();
   initParallax();
   initScrollReveal();
+  initAboutLetterRain();
 });
+
+/* ---------------------------------------------------------------
+   Letter Rain — Hero H1
+   Letters start from well above the viewport (above the navbar)
+   and fall with a realistic gravity curve to their natural position.
+   Each character is an independent span; runs once, no looping.
+   --------------------------------------------------------------- */
+function initHeroLetterRain() {
+  const h1 = document.querySelector('.letter-fall-hero');
+  if (!h1) return;
+
+  const navEl = document.querySelector('.nav-wrap');
+  const navH  = navEl ? navEl.offsetHeight : 64;
+
+  const nodes = Array.from(h1.childNodes);
+  const frag  = document.createDocumentFragment();
+  let idx = 0;
+
+  const processText = (text, container) => {
+    text.split('').forEach((ch) => {
+      if (ch === ' ') {
+        const sp = document.createElement('span');
+        sp.className = 'rf-space';
+        container.appendChild(sp);
+      } else {
+        const sp = document.createElement('span');
+        sp.className = 'rf-char';
+        sp.textContent = ch;
+        // 80ms head-start, then 38ms between each letter
+        sp.style.setProperty('--rf-delay', `${0.08 + idx * 0.038}s`);
+        container.appendChild(sp);
+        idx++;
+      }
+    });
+  };
+
+  nodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      processText(node.textContent, frag);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const wrapper = node.cloneNode(false);
+      processText(node.textContent, wrapper);
+      frag.appendChild(wrapper);
+    }
+  });
+
+  h1.innerHTML = '';
+  h1.appendChild(frag);
+
+  // Measure distance from viewport top after DOM is updated,
+  // then store it so the keyframe knows exactly how far to travel.
+  requestAnimationFrame(() => {
+    const rect = h1.getBoundingClientRect();
+    const fallDist = Math.round(rect.top + navH * 0.5);
+    h1.style.setProperty('--rf-fall', `${-Math.max(fallDist, 120)}px`);
+    h1.classList.add('rf-ready');
+  });
+}
+
+/* ---------------------------------------------------------------
+   Letter Rain — About paragraph (scroll-triggered)
+   Same physics; fires once when element scrolls into view.
+   --------------------------------------------------------------- */
+function initAboutLetterRain() {
+  const para = document.querySelector('.letter-fall-scroll');
+  if (!para) return;
+
+  const text = para.textContent;
+  para.innerHTML = '';
+  let idx = 0;
+
+  text.split('').forEach((ch) => {
+    if (ch === ' ') {
+      const sp = document.createElement('span');
+      sp.className = 'rf-space';
+      para.appendChild(sp);
+    } else {
+      const sp = document.createElement('span');
+      sp.className = 'rf-char';
+      sp.textContent = ch;
+      sp.dataset.rfIdx = idx;
+      para.appendChild(sp);
+      idx++;
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const rect = para.getBoundingClientRect();
+      const fallDist = Math.round(rect.top + 80);
+      para.style.setProperty('--rf-fall', `${-Math.min(Math.max(fallDist, 80), 480)}px`);
+      para.querySelectorAll('.rf-char').forEach((el, i) => {
+        el.style.setProperty('--rf-delay', `${i * 0.013}s`);
+      });
+      para.classList.add('rf-ready');
+      observer.unobserve(para);
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  observer.observe(para);
+}
+
+/* aliases so nothing external breaks */
+function initHeroLetterFall()  { initHeroLetterRain(); }
+function initAboutLetterFall() { initAboutLetterRain(); }
