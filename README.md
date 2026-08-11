@@ -2,9 +2,9 @@
 
 ## Structure
 ```
-portfolio-main/
+repository root/
 ├── backend/    → Render pe deploy hoga
-└── frontend/   → Cloudflare Pages pe deploy hoga
+└── frontend/   → Cloudflare Pages ka static output directory
 ```
 
 ---
@@ -62,11 +62,20 @@ Aur `frontend/_redirects` mein bhi:
 1. https://pages.cloudflare.com par jao → New Project
 2. GitHub repo connect karo
 3. Settings:
-   - **Root Directory:** `frontend`
+   - **Production Branch:** `main`
+   - **Framework Preset:** `None`
+   - **Root Directory:** (khali chhoro — repository root)
    - **Build Command:** (khali chhoro)
-   - **Output Directory:** (khali chhoro ya `/`)
+   - **Build Output Directory:** `frontend`
 
 4. Deploy karo
+
+> Important: Root Directory mein `portfolio-main/frontend` mat likho. Cloudflare
+> repository ko pehle hi `/opt/buildhome/repo` mein checkout karta hai, is liye
+> deployable site ka path sirf `frontend` hai. Agar existing project mein
+> `portfolio-main/frontend` configured hai, **Settings → Builds & deployments**
+> mein Root Directory clear karo aur Build Output Directory `frontend` set karo,
+> phir deployment retry karo.
 
 ---
 
