@@ -70,17 +70,187 @@ function initSplitText() {
    --------------------------------------------------------------- */
 function initParallax() {
   const visual = document.querySelector('.hero-visual');
-  if (!visual || window.matchMedia('(pointer: coarse)').matches) return;
-  let ticking = false;
+  if (visual && !window.matchMedia('(pointer: coarse)').matches) {
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = Math.min(window.scrollY, window.innerHeight) * 0.08;
+        visual.style.setProperty('--parallax', `${y}px`);
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  // Hero headline settles, then gently fades/scales/blurs away as the
+  // page scrolls past it — the "pinned hero" feel from the reel.
+  const heroCopy = document.querySelector('.hero-copy-stair');
+  const heroSection = document.querySelector('.hero');
+  if (heroCopy && heroSection && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let hTicking = false;
+    window.addEventListener('scroll', () => {
+      if (hTicking) return;
+      hTicking = true;
+      requestAnimationFrame(() => {
+        const h = heroSection.offsetHeight || 1;
+        const p = Math.min(Math.max(window.scrollY / h, 0), 1);
+        heroCopy.style.opacity = String(1 - p * 1.1);
+        heroCopy.style.transform = `translateY(${p * 60}px) scale(${1 - p * 0.08})`;
+        heroCopy.style.filter = p > 0.02 ? `blur(${(p * 6).toFixed(2)}px)` : '';
+        hTicking = false;
+      });
+    }, { passive: true });
+  }
+}
+
+/* ---------------------------------------------------------------
+   Smooth, inertial scroll (desktop / mouse only) — a small lerp-based
+   engine so wheel scrolling and in-page nav jumps glide the way the
+   reference reel does, instead of the browser's default step scroll.
+   No hijacking on touch devices or when the user prefers less motion;
+   native scrolling (and the CSS `scroll-behavior: smooth` fallback)
+   is left completely untouched for them.
+   --------------------------------------------------------------- */
+function initSmoothScroll() {
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (isCoarse || reduceMotion) return;
+
+  const mainEl = document.querySelector('main');
+  const EASE = 0.1;
+  let current = window.scrollY;
+  let target = window.scrollY;
+  let raf = null;
+
+  document.documentElement.style.scrollBehavior = 'auto';
+
+  function maxScroll() {
+    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
+  function clampTarget() { target = Math.max(0, Math.min(target, maxScroll())); }
+
+  function applyBlur(velocity) {
+    if (!mainEl) return;
+    const amt = Math.min(Math.abs(velocity) * 0.035, 2.5);
+    mainEl.style.filter = amt > 0.12 ? `blur(${amt.toFixed(2)}px)` : '';
+  }
+
+  function tick() {
+    const diff = target - current;
+    if (Math.abs(diff) < 0.4) {
+      current = target;
+      window.scrollTo(0, current);
+      applyBlur(0);
+      raf = null;
+      return;
+    }
+    current += diff * EASE;
+    window.scrollTo(0, current);
+    applyBlur(diff * EASE);
+    raf = requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) return; // leave pinch/scroll-zoom alone
+    e.preventDefault();
+    target += e.deltaY;
+    clampTarget();
+    if (!raf) raf = requestAnimationFrame(tick);
+  }, { passive: false });
+
+  // Keep in sync with scrolling we didn't cause (keyboard, scrollbar drag)
   window.addEventListener('scroll', () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const y = Math.min(window.scrollY, window.innerHeight) * 0.08;
-      visual.style.setProperty('--parallax', `${y}px`);
-      ticking = false;
-    });
+    if (raf) return;
+    current = window.scrollY;
+    target = window.scrollY;
   }, { passive: true });
+
+  window.addEventListener('resize', clampTarget);
+
+  // Smooth in-page nav jumps (Home / About / Work / Feedback / Contact)
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (!id || id.length < 2) return;
+      const el = document.querySelector(id);
+      if (!el) return;
+      e.preventDefault();
+      const navH = document.querySelector('.nav-wrap')?.offsetHeight || 0;
+      target = el.getBoundingClientRect().top + window.scrollY - navH - 26;
+      clampTarget();
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
+  });
+}
+
+/* ---------------------------------------------------------------
+   Project card 3D tilt — cursor-driven perspective tilt, the same
+   "card leans toward you" feel as the reel's floating panels.
+   Desktop / mouse only.
+   --------------------------------------------------------------- */
+function initCardTilt() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+  const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
+
+  grid.addEventListener('mousemove', (e) => {
+    const card = e.target.closest('.project-card');
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `perspective(1000px) rotateX(${(-py * 7).toFixed(2)}deg) rotateY(${(px * 9).toFixed(2)}deg) translateY(-8px)`;
+  });
+
+  grid.addEventListener('mouseout', (e) => {
+    const card = e.target.closest('.project-card');
+    if (!card || (e.relatedTarget && card.contains(e.relatedTarget))) return;
+    card.style.transform = '';
+  });
+}
+
+/* ---------------------------------------------------------------
+   About stats — count up from 0 the first time a real value lands
+   in the span (values arrive async from setStat()/loadProjects()).
+   --------------------------------------------------------------- */
+function initStatCounters() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const spans = ['statProjects', 'statStack'].map((id) => document.getElementById(id)).filter(Boolean);
+  if (!spans.length) return;
+
+  const animated = new WeakSet();
+  function animateTo(el, finalText) {
+    const finalNum = parseInt(finalText, 10);
+    if (isNaN(finalNum) || animated.has(el)) return;
+    animated.add(el);
+    const pad = finalText.length;
+    const duration = 900;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(finalNum * eased);
+      el.textContent = String(val).padStart(pad, '0');
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = finalText;
+    }
+    requestAnimationFrame(step);
+  }
+
+  const mo = new MutationObserver((mutations) => {
+    mutations.forEach((m) => {
+      const el = m.target.nodeType === 3 ? m.target.parentElement : m.target;
+      if (el && spans.includes(el) && /^\d+$/.test(el.textContent.trim())) {
+        animateTo(el, el.textContent.trim());
+      }
+    });
+  });
+  spans.forEach((el) => {
+    // catch values already set before this observer was attached
+    if (/^\d+$/.test(el.textContent.trim())) animateTo(el, el.textContent.trim());
+    mo.observe(el, { childList: true, characterData: true, subtree: true });
+  });
 }
 
 /* ---------------------------------------------------------------
@@ -254,7 +424,7 @@ function initProjects() {
       const images = project.images && project.images.length ? project.images : null;
       const card = document.createElement('div');
       card.className = 'project-card scroll-reveal';
-      card.setAttribute('data-reveal', i % 2 === 0 ? 'left' : 'right');
+      card.setAttribute('data-reveal', 'tilt');
       card.style.transitionDelay = `${i * 0.08}s`;
 
       let thumbInner;
@@ -539,6 +709,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initParallax();
   initScrollReveal();
   initAboutLetterRain();
+  initSmoothScroll();
+  initCardTilt();
+  initStatCounters();
 });
 
 /* ---------------------------------------------------------------

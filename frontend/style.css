@@ -157,11 +157,24 @@ ul { list-style: none; }
 .section-head { margin-bottom: 48px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .section-head-index { font-family: 'JetBrains Mono', monospace; color: var(--text-faint); font-size: 13px; }
 
-/* reveal-on-scroll */
-.scroll-reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
-.scroll-reveal.in-view { opacity: 1; transform: translateY(0); }
-.stagger > * { opacity: 0; transform: translateY(20px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
-.stagger.in-view > * { opacity: 1; transform: translateY(0); }
+/* reveal-on-scroll — blur-to-focus + soft rise, tuned to feel like a
+   smooth, inertial scroll rather than a plain fade */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(34px) scale(.975);
+  filter: blur(7px);
+  transition: opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease);
+  will-change: transform, opacity, filter;
+}
+.scroll-reveal.in-view { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+.stagger > * {
+  opacity: 0;
+  transform: translateY(24px) scale(.97);
+  filter: blur(5px);
+  transition: opacity .75s var(--ease), transform .75s var(--ease), filter .75s var(--ease);
+  will-change: transform, opacity, filter;
+}
+.stagger.in-view > * { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 .stagger.in-view > *:nth-child(1) { transition-delay: .02s; }
 .stagger.in-view > *:nth-child(2) { transition-delay: .10s; }
 .stagger.in-view > *:nth-child(3) { transition-delay: .18s; }
@@ -179,6 +192,16 @@ ul { list-style: none; }
 .scroll-reveal[data-reveal="rotate"] { transform: rotate(-3deg) translateY(22px); }
 .scroll-reveal[data-reveal="rotate"].in-view { transform: rotate(0) translateY(0); }
 
+/* "tilt" — 3D card flip-up, closest to the reference reel's card
+   entrances (perspective rotateX settling flat as it scrolls in) */
+.scroll-reveal[data-reveal="tilt"] {
+  transform: perspective(1000px) rotateX(18deg) translateY(46px) scale(.96);
+  transform-origin: 50% 100%;
+}
+.scroll-reveal[data-reveal="tilt"].in-view {
+  transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+}
+
 /* split-text: words slide up out of a clipped mask, staggered by JS.
    The heading keeps its normal block display; only the per-word
    spans need the inline-block masking trick. */
@@ -189,11 +212,20 @@ ul { list-style: none; }
 /* subtle scroll-linked parallax on the hero visual */
 .hero-visual { transform: translateY(var(--parallax, 0px)); will-change: transform; }
 
+/* subtle scroll-velocity blur applied to <main> by JS during fast
+   momentum scrolling (desktop only); eased out with a short transition
+   so it never looks like a hard toggle */
+main { transition: filter .18s ease-out; will-change: filter; }
+
+/* interactive 3D tilt on project cards, driven by JS custom props */
+.project-card { transform-style: preserve-3d; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .scroll-reveal, .stagger > * { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .scroll-reveal, .stagger > * { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
   .split-word { opacity: 1 !important; transform: none !important; transition: none !important; }
   .hero-visual { transform: none !important; }
+  main { filter: none !important; }
   * { animation-duration: .01ms !important; }
 }
 
