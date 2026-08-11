@@ -697,21 +697,14 @@ function initContactForm() {
    Boot
    --------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  initNav();
-  initClock();
-  initLikes();
-  initHeroLetterRain();
-  initSkills();
-  initProjects();
-  initComments();
-  initContactForm();
-  initSplitText();
-  initParallax();
-  initScrollReveal();
-  initAboutLetterRain();
-  initSmoothScroll();
-  initCardTilt();
-  initStatCounters();
+  const boot = [
+    initNav, initClock, initLikes, initHeroLetterRain, initSkills, initProjects,
+    initComments, initContactForm, initSplitText, initParallax, initScrollReveal,
+    initAboutLetterRain, initSmoothScroll, initCardTilt, initStatCounters
+  ];
+  boot.forEach((fn) => {
+    try { fn(); } catch (err) { console.error(`[portfolio] ${fn.name} failed:`, err); }
+  });
 });
 
 /* ---------------------------------------------------------------
