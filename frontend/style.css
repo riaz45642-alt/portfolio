@@ -2311,3 +2311,64 @@ main { transition: filter .18s ease-out; will-change: filter; }
     padding-bottom: 24px;
   }
 }
+
+/* Contact hover stabilization and selected-platform indicator. */
+#contact .contact-selected-icon {
+  position: absolute;
+  top: clamp(22px, 4vw, 42px);
+  left: clamp(20px, 4vw, 48px);
+  z-index: 5;
+  width: clamp(56px, 7vw, 82px);
+  height: clamp(56px, 7vw, 82px);
+  display: grid;
+  place-items: center;
+  color: #f3f0e8;
+  font-size: clamp(32px, 4vw, 48px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px) scale(.92);
+  transition: opacity var(--motion-fast) ease, transform var(--motion-fast) var(--motion-ease), visibility var(--motion-fast);
+}
+#contact .contact-selected-icon.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+#contact .contact-selected-icon[data-platform="wa"] { color: #25d366; }
+#contact .contact-selected-icon[data-platform="ig"] { color: #e4405f; }
+#contact .contact-selected-icon[data-platform="gh"] { color: #f5f5f5; }
+#contact .contact-selected-icon[data-platform="em"] { color: #ea4335; }
+#contact .contact-selected-icon[data-platform="li"] { color: #0a66c2; }
+#contact .contact-selected-icon[data-platform="map"] { color: #ea4335; }
+
+#contact .contact-icon:hover,
+#contact .contact-icon:focus-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  animation-play-state: paused !important;
+  filter: drop-shadow(0 12px 18px rgb(0 0 0 / 28%));
+  box-shadow: none;
+}
+#contact .contact-icon.wa:hover,
+#contact .contact-icon.wa:focus-visible { color: #25d366; background: rgba(37,211,102,.10); }
+#contact .contact-icon.ig:hover,
+#contact .contact-icon.ig:focus-visible { color: #e4405f; background: rgba(228,64,95,.10); }
+#contact .contact-icon.gh:hover,
+#contact .contact-icon.gh:focus-visible { color: #f5f5f5; background: rgba(245,245,245,.08); }
+#contact .contact-icon.em:hover,
+#contact .contact-icon.em:focus-visible { color: #ea4335; background: rgba(234,67,53,.10); }
+#contact .contact-icon.li:hover,
+#contact .contact-icon.li:focus-visible { color: #0a66c2; background: rgba(10,102,194,.13); }
+#contact .contact-icon.map:hover,
+#contact .contact-icon.map:focus-visible { color: #ea4335; background: rgba(234,67,53,.10); }
+
+@media (max-width: 520px) {
+  #contact .contact-selected-icon {
+    top: 16px;
+    left: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 29px;
+  }
+}

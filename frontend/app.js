@@ -686,6 +686,7 @@ function initContactField() {
   const section = document.querySelector('.contact-section');
   const field = section?.querySelector('.contact-icon-row');
   const title = section?.querySelector('.contact-editorial-title');
+  const selectedIndicator = section?.querySelector('.contact-selected-icon');
   const icons = field ? [...field.querySelectorAll('.contact-icon')] : [];
   if (!section || !field || !icons.length) return;
 
@@ -704,13 +705,21 @@ function initContactField() {
 
   field.classList.add('is-animated');
 
-  const limitsFor = (icon) => {
-    const inset = window.innerWidth <= 620 ? 18 : 34;
+  const limitsFor = (icon, state) => {
+    const inset = window.innerWidth <= 620 ? 12 : 22;
+    const columns = 3;
+    const rows = 2;
+    const column = state.index % columns;
+    const row = Math.floor(state.index / columns);
+    const cellWidth = field.clientWidth / columns;
+    const cellHeight = field.clientHeight / rows;
+    const cellLeft = column * cellWidth;
+    const cellTop = row * cellHeight;
     return {
-      minX: inset,
-      minY: inset,
-      maxX: Math.max(inset, field.clientWidth - icon.offsetWidth - inset),
-      maxY: Math.max(inset, field.clientHeight - icon.offsetHeight - inset)
+      minX: cellLeft + inset,
+      minY: cellTop + inset,
+      maxX: Math.max(cellLeft + inset, cellLeft + cellWidth - icon.offsetWidth - inset),
+      maxY: Math.max(cellTop + inset, cellTop + cellHeight - icon.offsetHeight - inset)
     };
   };
 
@@ -721,12 +730,10 @@ function initContactField() {
 
   const layout = () => {
     states.forEach((state) => {
-      const limits = limitsFor(state.icon);
+      const limits = limitsFor(state.icon, state);
       if (!initialized) {
-        const column = state.index % 3;
-        const row = Math.floor(state.index / 3);
-        state.x = limits.minX + (limits.maxX - limits.minX) * ((column + 0.5) / 3);
-        state.y = limits.minY + (limits.maxY - limits.minY) * (row ? 0.72 : 0.28);
+        state.x = limits.minX + (limits.maxX - limits.minX) * 0.5;
+        state.y = limits.minY + (limits.maxY - limits.minY) * 0.5;
       } else {
         state.x = Math.min(limits.maxX, Math.max(limits.minX, state.x));
         state.y = Math.min(limits.maxY, Math.max(limits.minY, state.y));
@@ -741,12 +748,26 @@ function initContactField() {
     lastTime = performance.now();
   };
 
+  const showSelectedIcon = (icon) => {
+    if (!selectedIndicator) return;
+    const platformMark = icon.querySelector('i');
+    if (!platformMark) return;
+    selectedIndicator.replaceChildren(platformMark.cloneNode(true));
+    selectedIndicator.dataset.platform = [...icon.classList].find((name) => name !== 'contact-icon') || '';
+    selectedIndicator.classList.add('is-visible');
+  };
+
+  const hideSelectedIcon = () => {
+    if (!selectedIndicator) return;
+    selectedIndicator.classList.remove('is-visible');
+  };
+
   const animate = (time) => {
     const dt = Math.min((time - lastTime) / 1000, 0.035);
     lastTime = time;
     if (!paused && !reducedMotion.matches) {
       states.forEach((state) => {
-        const limits = limitsFor(state.icon);
+        const limits = limitsFor(state.icon, state);
         state.vx += Math.sin(time * 0.00033 + state.phaseX) * 7 * dt;
         state.vy += Math.cos(time * 0.00029 + state.phaseY) * 7 * dt;
         const speed = Math.hypot(state.vx, state.vy);
@@ -792,6 +813,15 @@ function initContactField() {
   section.addEventListener('focusout', (event) => {
     if (!section.contains(event.relatedTarget)) setPaused(false);
   });
+  icons.forEach((icon) => {
+    icon.addEventListener('pointerenter', () => showSelectedIcon(icon));
+    icon.addEventListener('pointerleave', (event) => {
+      if (!event.relatedTarget?.closest?.('.contact-icon')) hideSelectedIcon();
+    });
+    icon.addEventListener('focus', () => showSelectedIcon(icon));
+    icon.addEventListener('blur', hideSelectedIcon);
+  });
+  field.addEventListener('pointerleave', hideSelectedIcon);
   window.addEventListener('resize', layout, { passive: true });
   document.addEventListener('visibilitychange', () => setPaused(document.hidden));
 
