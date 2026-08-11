@@ -6,7 +6,6 @@
    ==================================================================== */
 
 const API_BASE = 'https://ahmad-portfolio-api.onrender.com/api';
-const WHATSAPP_NUMBER = '923234567863';
 const LIKE_STORAGE_KEY = 'portfolio_liked';
 
 /* ---------------------------------------------------------------
@@ -79,6 +78,22 @@ function initParallax() {
         const y = Math.min(window.scrollY, window.innerHeight) * 0.08;
         visual.style.setProperty('--parallax', `${y}px`);
         ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  const feedbackTitle = document.querySelector('.feedback-background-title');
+  const feedbackSection = document.getElementById('feedback');
+  if (feedbackTitle && feedbackSection && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let feedbackTicking = false;
+    window.addEventListener('scroll', () => {
+      if (feedbackTicking) return;
+      feedbackTicking = true;
+      requestAnimationFrame(() => {
+        const rect = feedbackSection.getBoundingClientRect();
+        const progress = Math.max(-1, Math.min(1, (window.innerHeight * 0.5 - rect.top) / window.innerHeight));
+        feedbackTitle.style.transform = `translate3d(${progress * -12}px, ${progress * 18}px, 0)`;
+        feedbackTicking = false;
       });
     }, { passive: true });
   }
@@ -260,12 +275,13 @@ function initNav() {
   const navWrap = document.querySelector('.nav-wrap');
   const toggle = document.querySelector('.nav-toggle');
   const links = document.querySelectorAll('.nav-links a[href^="#"]');
+  const menuLinks = document.querySelectorAll('.nav-links a');
   const sections = [...links].map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
 
   if (toggle) {
     toggle.addEventListener('click', () => navWrap.classList.toggle('menu-open'));
   }
-  links.forEach((a) => a.addEventListener('click', () => navWrap.classList.remove('menu-open')));
+  menuLinks.forEach((a) => a.addEventListener('click', () => navWrap.classList.remove('menu-open')));
 
   if (!sections.length) return;
   const setActive = (id) => {
@@ -277,6 +293,46 @@ function initNav() {
     });
   }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
   sections.forEach((s) => observer.observe(s));
+
+  // Keep the transparent navigation readable by sampling the section
+  // directly beneath it and classifying that section's computed color.
+  let colorTicking = false;
+  const effectiveBackground = (element) => {
+    let current = element;
+    while (current) {
+      const color = getComputedStyle(current).backgroundColor;
+      const values = color.match(/[\d.]+/g)?.map(Number) || [];
+      if (values.length >= 3 && (values.length < 4 || values[3] > 0.05)) return values.slice(0, 3);
+      current = current.parentElement;
+    }
+    return [11, 11, 13];
+  };
+  const updateNavContrast = () => {
+    colorTicking = false;
+    const navRect = navWrap.getBoundingClientRect();
+    const sampleY = navRect.top + navRect.height / 2;
+    const section = sections.find((item) => {
+      const rect = item.getBoundingClientRect();
+      return rect.top <= sampleY && rect.bottom > sampleY;
+    }) || sections.reduce((closest, item) => {
+      const rect = item.getBoundingClientRect();
+      const distance = sampleY < rect.top ? rect.top - sampleY : sampleY - rect.bottom;
+      return !closest || distance < closest.distance ? { item, distance } : closest;
+    }, null)?.item || sections[0];
+    const [r, g, b] = effectiveBackground(section);
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    const onLight = luminance > 0.58;
+    navWrap.classList.toggle('nav-on-light', onLight);
+    navWrap.classList.toggle('nav-on-dark', !onLight);
+  };
+  const requestNavContrast = () => {
+    if (colorTicking) return;
+    colorTicking = true;
+    requestAnimationFrame(updateNavContrast);
+  };
+  window.addEventListener('scroll', requestNavContrast, { passive: true });
+  window.addEventListener('resize', requestNavContrast);
+  requestNavContrast();
 }
 
 /* ---------------------------------------------------------------
@@ -352,140 +408,78 @@ function initLikes() {
 }
 
 /* ---------------------------------------------------------------
-   Projects — layered/stacked scroll showcase.
-   Pure scroll-linked animation (no external animation library, no
-   CDN dependency, no async-load race) so the deck's very first
-   paint already matches the JS-driven state exactly — no flicker,
-   no flash of an "already opened" layout.
-
-   Mental model: the wrapper (#stackWrap) is tall enough to give
-   exactly (cards.length - 1) full-viewport steps of scroll room.
-   The inner .stack-sticky pins itself via native `position:sticky`
-   while the user scrolls through that room. On every scroll/resize
-   tick we compute a single 0..1 progress value from the wrapper's
-   position, translate that into a continuous "depth" per card
-   (depth = card index - progress * (N - 1)), and map depth straight
-   to a transform/opacity/blur pose:
-     depth  0        -> fully open, front of the stack
-     depth  1,2,3...  -> further back in the stacked deck (peeking)
-     depth -1         -> already opened and gliding out of view
-   Because this is a continuous function of scroll position (not a
-   discrete step triggered once per section), cards reveal exactly
-   one at a time, in lock-step with the scrollbar, and reverse
-   cleanly when scrolling back up.
+   Projects — soft grid of laptop-mockup cards. No scroll-linked
+   animation: info reveals purely via CSS on hover/focus. This just
+   wires each card's CTA to its live/GitHub link (or disables it
+   while a project is still in development) and reports the count.
    --------------------------------------------------------------- */
 function initProjectsStack() {
-  const wrap = document.getElementById('stackWrap');
-  const sticky = document.querySelector('.stack-sticky');
-  const cards = [...document.querySelectorAll('.stack-card')];
-  const dots = [...document.querySelectorAll('.stack-progress-dot')];
-  if (!wrap || !sticky || !cards.length) return;
+  const cards = [...document.querySelectorAll('.proj-card')];
+  if (!cards.length) return;
+  const grid = document.querySelector('.proj-grid');
+  const touchLayout = window.matchMedia('(hover: none), (pointer: coarse)');
 
-  const N = cards.length;
-  setStat('statProjects', String(N).padStart(3, '0'));
+  setStat('statProjects', String(cards.length).padStart(3, '0'));
 
-  // status -> CTA label/href placeholder (real URLs added later by hand)
   cards.forEach((card) => {
     const status = card.dataset.status;
-    const cta = card.querySelector('.stack-card-cta');
+    const cta = card.querySelector('.proj-cta');
     const label = cta?.querySelector('.cta-label');
+    const screen = card.querySelector('.proj-laptop-screen');
+    const image = screen?.querySelector('img');
+    if (screen && image) screen.style.setProperty('--project-image', `url("${image.getAttribute('src')}")`);
     if (!cta || !label) return;
-    if (status === 'live' && card.dataset.live) { cta.href = card.dataset.live; label.textContent = 'View Live'; }
+    if (status === 'live' && card.dataset.live) {
+      cta.href = card.dataset.live;
+      cta.target = '_blank';
+      cta.rel = 'noopener';
+      label.textContent = 'View Site';
+      cta.removeAttribute('aria-disabled');
+    }
+    else if (status === 'live') {
+      cta.removeAttribute('href');
+      cta.setAttribute('aria-disabled', 'true');
+      label.textContent = 'View Site';
+      cta.addEventListener('click', (e) => e.preventDefault());
+    }
     else if (status === 'github' && card.dataset.github) { cta.href = card.dataset.github; label.textContent = 'View on GitHub'; }
-    else { cta.removeAttribute('href'); cta.addEventListener('click', (e) => e.preventDefault()); }
+    else {
+      cta.removeAttribute('href');
+      label.textContent = 'In Development';
+      cta.addEventListener('click', (e) => e.preventDefault());
+    }
+
+    card.tabIndex = 0;
+    card.setAttribute('aria-expanded', 'false');
   });
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Control points mapping "depth" (card index minus scroll progress)
-  // to a visual pose. depth 0 = open/front card. Positive depth =
-  // stacked further back (still visible, peeking). Negative depth =
-  // already shown and exiting. These exact numbers are mirrored in
-  // the default CSS ([data-index] rules) so first paint == JS state.
-  const POSES = [
-    { d: -1, ty: -46, scale: 1.06, opacity: 0,   blur: 8 },
-    { d: 0,  ty: 0,   scale: 1,    opacity: 1,   blur: 0 },
-    { d: 1,  ty: 14,  scale: .96,  opacity: .92, blur: 0 },
-    { d: 2,  ty: 27,  scale: .92,  opacity: .76, blur: 0 },
-    { d: 3,  ty: 38,  scale: .885, opacity: .56, blur: 0 },
-    { d: 4,  ty: 47,  scale: .85,  opacity: .36, blur: 0 }
-  ];
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const smooth = (t) => t * t * (3 - 2 * t);
-
-  function poseAt(depth) {
-    const dc = Math.min(Math.max(depth, POSES[0].d), POSES[POSES.length - 1].d);
-    let lo = POSES[0], hi = POSES[POSES.length - 1];
-    for (let k = 0; k < POSES.length - 1; k++) {
-      if (dc >= POSES[k].d && dc <= POSES[k + 1].d) { lo = POSES[k]; hi = POSES[k + 1]; break; }
-    }
-    const span = (hi.d - lo.d) || 1;
-    const t = smooth((dc - lo.d) / span);
-    return {
-      ty: lerp(lo.ty, hi.ty, t),
-      scale: lerp(lo.scale, hi.scale, t),
-      opacity: lerp(lo.opacity, hi.opacity, t),
-      blur: lerp(lo.blur, hi.blur, t)
-    };
-  }
-
-  // Wrapper height = exactly the scroll room the animation needs:
-  // one viewport to arrive + (N - 1) viewports to step through the
-  // rest, so there is never leftover empty space above/below the
-  // pinned deck. Recalculated on resize.
-  function sizeWrap() {
-    wrap.style.height = `${N * 100}vh`;
-  }
-  sizeWrap();
-
-  let ticking = false;
-
-  function render() {
-    ticking = false;
-    const vh = window.innerHeight;
-    const rect = wrap.getBoundingClientRect();
-    const scrollable = wrap.offsetHeight - vh;
-    let progress = scrollable > 0 ? (-rect.top) / scrollable : 0;
-    progress = Math.min(1, Math.max(0, progress));
-
-    const activeFloat = progress * (N - 1);
-    const activeIndex = Math.round(activeFloat);
-
-    cards.forEach((card, i) => {
-      const depth = i - activeFloat;
-      const pose = reduced
-        ? (depth <= -0.5 ? POSES[0] : (i === activeIndex ? POSES[1] : POSES[Math.min(POSES.length - 1, Math.max(1, Math.round(depth) + 1))]))
-        : poseAt(depth);
-
-      card.style.transform = `translateY(${pose.ty.toFixed(2)}px) scale(${pose.scale.toFixed(3)})`;
-      card.style.opacity = pose.opacity.toFixed(3);
-      card.style.filter = pose.blur > 0.4 ? `blur(${pose.blur.toFixed(1)}px)` : 'none';
-
-      const dc = Math.min(Math.max(depth, POSES[0].d), POSES[POSES.length - 1].d);
-      card.style.zIndex = String(Math.round((4 - dc) * 10) + 10);
-
-      // Only the front-most (and its immediate peeking neighbor)
-      // should be interactive/hoverable — deeper or exited cards
-      // sit behind and shouldn't intercept pointer events.
-      const interactive = depth > -0.5 && depth < 1.5;
-      card.style.pointerEvents = interactive ? 'auto' : 'none';
-      card.classList.toggle('is-front', i === activeIndex);
+  const activate = (activeCard) => {
+    if (!grid) return;
+    grid.classList.add('has-active');
+    cards.forEach((card) => {
+      const active = card === activeCard;
+      card.classList.toggle('is-active', active);
+      card.setAttribute('aria-expanded', String(active));
     });
+  };
 
-    dots.forEach((d, i) => d.classList.toggle('active', i === activeIndex));
-  }
-
-  function requestRender() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(render);
-  }
-
-  window.addEventListener('scroll', requestRender, { passive: true });
-  window.addEventListener('resize', () => { sizeWrap(); requestRender(); });
-
-  render(); // paint the correct initial state immediately (matches default CSS)
+  cards.forEach((card) => {
+    card.addEventListener('click', (event) => {
+      if (!touchLayout.matches) return;
+      const link = event.target.closest('.proj-cta');
+      if (link && card.classList.contains('is-active')) return;
+      if (!card.classList.contains('is-active')) event.preventDefault();
+      activate(card);
+    });
+    card.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.target.closest('.proj-cta')) return;
+      event.preventDefault();
+      activate(card);
+    });
+  });
 }
+
 
 /* ---------------------------------------------------------------
    Skills bars (static data, animated on reveal)
@@ -503,10 +497,15 @@ function initSkills() {
     { name: 'Responsive Design', level: 92 }
   ];
 
-  grid.innerHTML = skills.map((s) => `
-    <div class="skill-card">
-      <h4>${s.name} <span>${s.level}%</span></h4>
-      <div class="skill-bar"><div class="skill-fill" data-width="${s.level}"></div></div>
+  grid.innerHTML = skills.map((s, index) => `
+    <div class="skill-card" style="--skill-order:${index}">
+      <div class="skill-meta">
+        <h4>${s.name}</h4>
+      </div>
+      <div class="skill-bar" role="progressbar" aria-label="${s.name}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${s.level}">
+        <div class="skill-fill" data-width="${s.level}"></div>
+      </div>
+      <span class="skill-percent">${s.level}%</span>
     </div>`).join('');
 
   setStat('statStack', String(skills.length).padStart(3, '0'));
@@ -515,7 +514,8 @@ function initSkills() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        grid.querySelectorAll('.skill-fill').forEach((el) => { el.style.width = `${el.dataset.width}%`; });
+        grid.classList.add('skills-visible');
+        grid.querySelectorAll('.skill-fill').forEach((el) => { el.style.height = `${el.dataset.width}%`; });
         observer.disconnect();
       }
     });
@@ -557,8 +557,7 @@ function initComments() {
           <div class="comment-author">
             <div class="comment-avatar">${escapeHtml(getInitials(comment.name))}</div>
             <div class="comment-author-info">
-              <h4>${escapeHtml(comment.name)}${comment.company ? ` <span>• ${escapeHtml(comment.company)}</span>` : ''}</h4>
-              <span>${escapeHtml(comment.email)}</span>
+              <h4>${escapeHtml(comment.name)}</h4>
             </div>
           </div>
           <div class="comment-date">${formatDate(comment.created_at)}</div>
@@ -570,13 +569,10 @@ function initComments() {
         </div>
         ${!isReply ? `
         <div class="reply-form" id="reply-form-${comment.id}">
-          <div class="form-row">
-            <div class="form-group"><label>Name *</label><input type="text" id="replyName-${comment.id}" placeholder="Your name" /></div>
-            <div class="form-group"><label>Company</label><input type="text" id="replyCompany-${comment.id}" placeholder="Optional" /></div>
+          <div class="feedback-mini-row">
+            <textarea id="replyMessage-${comment.id}" placeholder="Write a reply..."></textarea>
+            <button class="btn-submit feedback-mini-submit" onclick="window.__submitReply(${comment.id})" aria-label="Post reply"><i class="fas fa-reply"></i></button>
           </div>
-          <div class="form-group"><label>Email *</label><input type="email" id="replyEmail-${comment.id}" placeholder="you@example.com" /></div>
-          <div class="form-group"><label>Reply *</label><textarea id="replyMessage-${comment.id}" placeholder="Write your reply..."></textarea></div>
-          <button class="btn-submit" onclick="window.__submitReply(${comment.id})"><i class="fas fa-reply"></i> Post Reply</button>
         </div>` : ''}
         ${replies ? `<div class="comment-replies">${replies}</div>` : ''}
       </div>`;
@@ -588,6 +584,13 @@ function initComments() {
       return;
     }
     list.innerHTML = allComments.map((c) => renderComment(c)).join('');
+    const cards = [...list.querySelectorAll('.comment-card')];
+    requestAnimationFrame(() => {
+      cards.forEach((card, index) => {
+        card.style.setProperty('--comment-order', index);
+        card.classList.add('is-visible');
+      });
+    });
   }
 
   async function loadComments() {
@@ -618,13 +621,15 @@ function initComments() {
   };
 
   window.__submitReply = async (parentId) => {
-    const name = document.getElementById(`replyName-${parentId}`).value.trim();
-    const company = document.getElementById(`replyCompany-${parentId}`).value.trim();
-    const email = document.getElementById(`replyEmail-${parentId}`).value.trim();
-    const message = document.getElementById(`replyMessage-${parentId}`).value.trim();
-    if (!name || !email || !message) return showAlert('error', 'Please fill in your name, email, and reply.');
+    const messageEl = document.getElementById(`replyMessage-${parentId}`);
+    const message = messageEl.value.trim();
+    if (!message) return showAlert('error', 'Please write a reply before posting.');
     try {
-      const res = await fetch(`${API_BASE}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, company, email, message, parent_id: parentId }) });
+      const res = await fetch(`${API_BASE}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Anonymous', email: 'anonymous@portfolio.visitor', message, parent_id: parentId })
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
       const parent = allComments.find((c) => c.id === parentId);
@@ -637,27 +642,34 @@ function initComments() {
   };
 
   document.getElementById('submitCommentBtn')?.addEventListener('click', async () => {
-    const name    = document.getElementById('commentName').value.trim();
-    const email   = document.getElementById('commentEmail').value.trim();
-    const message = document.getElementById('commentMessage').value.trim();
-    if (!name || !email || !message) return showAlert('error', 'Please fill in your name, email, and comment.');
+    const messageEl = document.getElementById('commentMessage');
+    const message = messageEl.value.trim();
+    if (!message) return showAlert('error', 'Please write something before posting.');
 
     const btn = document.getElementById('submitCommentBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+    const originalIcon = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     try {
-      const res = await fetch(`${API_BASE}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, message }) });
+      // The form no longer collects name/email (per the minimal design),
+      // so every comment posts anonymously — the backend still stores a
+      // name/email pair, filled in here with a fixed placeholder.
+      const res = await fetch(`${API_BASE}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Anonymous', email: 'anonymous@portfolio.visitor', message })
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
       allComments.unshift(data.comment);
       renderComments();
       showAlert('success');
-      ['commentName', 'commentEmail', 'commentMessage'].forEach((id) => { document.getElementById(id).value = ''; });
+      messageEl.value = '';
     } catch (err) {
       showAlert('error', err.message || 'Could not post your comment.');
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post comment';
+      btn.innerHTML = originalIcon;
     }
   });
 
@@ -665,86 +677,127 @@ function initComments() {
 }
 
 /* ---------------------------------------------------------------
-   Contact form — same primary behaviour as before (opens WhatsApp
-   with a pre-filled message). Also fires a silent, best-effort
-   POST to /api/contact so the message is logged in the database;
-   this never blocks or affects the WhatsApp flow.
+   Contact — now a compact row of direct platform links (WhatsApp,
+   Instagram, GitHub, Email, LinkedIn, Maps). Every icon is a plain
+   <a href> in the markup, so no JS wiring is needed here at all.
    --------------------------------------------------------------- */
-/* ---------------------------------------------------------------
-   Contact — cinematic photo drop, scroll-scrubbed via GSAP.
-   The photo starts high, rotated and scaled down, and settles into
-   its resting spot as the Contact section scrolls into view — a
-   layered, physical-feeling reveal rather than a plain fade-in.
-   --------------------------------------------------------------- */
-function initContactPhotoDrop() {
-  const photo = document.getElementById('contactPhotoDrop');
-  const section = document.getElementById('contact');
-  if (!photo || !section || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) { gsap.set(photo, { opacity: .9, rotate: -4, y: 0, scale: 1 }); return; }
+function initContactField() {
+  const section = document.querySelector('.contact-section');
+  const field = section?.querySelector('.contact-icon-row');
+  const title = section?.querySelector('.contact-editorial-title');
+  const icons = field ? [...field.querySelectorAll('.contact-icon')] : [];
+  if (!section || !field || !icons.length) return;
 
-  gsap.fromTo(photo,
-    { y: '-30%', rotate: -9, scale: .82, opacity: 0 },
-    {
-      y: '0%', rotate: -4, scale: 1, opacity: 1,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: section,
-        start: 'top 85%',
-        end: 'top 25%',
-        scrub: 0.8
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const states = icons.map((icon, index) => ({
+    icon, index, x: 0, y: 0,
+    vx: (index % 2 ? -1 : 1) * (14 + Math.random() * 12),
+    vy: (index % 3 ? 1 : -1) * (11 + Math.random() * 11),
+    phaseX: Math.random() * Math.PI * 2,
+    phaseY: Math.random() * Math.PI * 2,
+    maxSpeed: 25 + Math.random() * 13
+  }));
+  let paused = false;
+  let initialized = false;
+  let lastTime = performance.now();
+
+  field.classList.add('is-animated');
+
+  const limitsFor = (icon) => {
+    const inset = window.innerWidth <= 620 ? 18 : 34;
+    return {
+      minX: inset,
+      minY: inset,
+      maxX: Math.max(inset, field.clientWidth - icon.offsetWidth - inset),
+      maxY: Math.max(inset, field.clientHeight - icon.offsetHeight - inset)
+    };
+  };
+
+  const render = (state, time = 0) => {
+    const angle = reducedMotion.matches ? 0 : Math.sin(time * 0.00042 + state.phaseX) * 5;
+    state.icon.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) rotate(${angle}deg)`;
+  };
+
+  const layout = () => {
+    states.forEach((state) => {
+      const limits = limitsFor(state.icon);
+      if (!initialized) {
+        const column = state.index % 3;
+        const row = Math.floor(state.index / 3);
+        state.x = limits.minX + (limits.maxX - limits.minX) * ((column + 0.5) / 3);
+        state.y = limits.minY + (limits.maxY - limits.minY) * (row ? 0.72 : 0.28);
+      } else {
+        state.x = Math.min(limits.maxX, Math.max(limits.minX, state.x));
+        state.y = Math.min(limits.maxY, Math.max(limits.minY, state.y));
       }
+      render(state);
     });
+    initialized = true;
+  };
 
-  // tiny parallax drift while the section is in view — adds depth
-  gsap.to(photo, {
-    y: '+=18',
-    ease: 'none',
-    scrollTrigger: { trigger: section, start: 'top top', end: 'bottom top', scrub: 1 }
-  });
-}
+  const setPaused = (value) => {
+    paused = value;
+    lastTime = performance.now();
+  };
 
-function initContactForm() {
-  const submitBtn = document.getElementById('contactSubmitBtn');
-  if (!submitBtn) return;
-
-  submitBtn.addEventListener('click', () => {
-    const successAlert = document.getElementById('contactAlertSuccess');
-    const errorAlert = document.getElementById('contactAlertError');
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const subjectSelect = document.getElementById('subject');
-    const subject = subjectSelect.value;
-    const message = document.getElementById('message').value.trim();
-
-    if (!firstName || !email || !message) {
-      errorAlert.textContent = 'Please fill in your name, email, and message.';
-      errorAlert.style.display = 'flex';
-      successAlert.style.display = 'none';
-      setTimeout(() => { errorAlert.style.display = 'none'; }, 4000);
-      return;
+  const animate = (time) => {
+    const dt = Math.min((time - lastTime) / 1000, 0.035);
+    lastTime = time;
+    if (!paused && !reducedMotion.matches) {
+      states.forEach((state) => {
+        const limits = limitsFor(state.icon);
+        state.vx += Math.sin(time * 0.00033 + state.phaseX) * 7 * dt;
+        state.vy += Math.cos(time * 0.00029 + state.phaseY) * 7 * dt;
+        const speed = Math.hypot(state.vx, state.vy);
+        if (speed > state.maxSpeed) {
+          state.vx = (state.vx / speed) * state.maxSpeed;
+          state.vy = (state.vy / speed) * state.maxSpeed;
+        }
+        state.x += state.vx * dt;
+        state.y += state.vy * dt;
+        if (state.x <= limits.minX || state.x >= limits.maxX) {
+          state.x = Math.min(limits.maxX, Math.max(limits.minX, state.x));
+          state.vx *= -1;
+        }
+        if (state.y <= limits.minY || state.y >= limits.maxY) {
+          state.y = Math.min(limits.maxY, Math.max(limits.minY, state.y));
+          state.vy *= -1;
+        }
+        render(state, time);
+      });
     }
-    errorAlert.style.display = 'none';
+    requestAnimationFrame(animate);
+  };
 
-    const subjectLabel = subject ? subjectSelect.options[subjectSelect.selectedIndex].text : 'General Inquiry';
-    const text = `New message from Portfolio Contact Form\n\nName: ${firstName} ${lastName}\nEmail: ${email}\nSubject: ${subjectLabel}\nMessage: ${message}`;
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  section.addEventListener('pointerenter', () => setPaused(true));
+  section.addEventListener('pointerleave', () => setPaused(false));
+  section.addEventListener('pointermove', (event) => {
+    if (!title || reducedMotion.matches) return;
+    const rect = section.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 18;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 10;
+    title.style.setProperty('--contact-shift-x', `${x}px`);
+    title.style.setProperty('--contact-shift-y', `${y}px`);
+  });
+  section.addEventListener('pointerleave', () => {
+    if (!title) return;
+    title.style.setProperty('--contact-shift-x', '0px');
+    title.style.setProperty('--contact-shift-y', '0px');
+  });
+  section.addEventListener('pointerdown', () => setPaused(true));
+  section.addEventListener('pointerup', () => setPaused(false));
+  section.addEventListener('pointercancel', () => setPaused(false));
+  section.addEventListener('focusin', () => setPaused(true));
+  section.addEventListener('focusout', (event) => {
+    if (!section.contains(event.relatedTarget)) setPaused(false);
+  });
+  window.addEventListener('resize', layout, { passive: true });
+  document.addEventListener('visibilitychange', () => setPaused(document.hidden));
 
-    successAlert.style.display = 'flex';
-    window.open(whatsappUrl, '_blank');
-
-    // best-effort, silent — does not affect the WhatsApp flow above
-    fetch(`${API_BASE}/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: `${firstName} ${lastName}`.trim(), email, subject: subjectLabel, message })
-    }).catch(() => {});
-
-    ['firstName', 'lastName', 'email', 'message'].forEach((id) => { document.getElementById(id).value = ''; });
-    subjectSelect.value = '';
-    setTimeout(() => { successAlert.style.display = 'none'; }, 5000);
+  requestAnimationFrame(() => {
+    layout();
+    requestAnimationFrame(animate);
   });
 }
 
@@ -754,7 +807,7 @@ function initContactForm() {
 document.addEventListener('DOMContentLoaded', () => {
   const boot = [
     initNav, initClock, initLikes, initHeroLetterRain, initSkills, initProjectsStack,
-    initComments, initContactForm, initContactPhotoDrop, initSplitText, initParallax, initScrollReveal,
+    initComments, initContactField, initSplitText, initParallax, initScrollReveal,
     initAboutLetterRain, initSmoothScroll, initStatCounters
   ];
   boot.forEach((fn) => {

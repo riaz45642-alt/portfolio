@@ -1,164 +1,596 @@
 /* ===========================================================
-   Projects — layered / stacked scroll showcase
-   Driven by a native scroll-linked JS loop (see initProjectsStack
-   in app.js). No external animation library required — the CSS
-   below defines the *resting* stacked pose for every card so the
-   deck renders correctly on first paint, before any JS runs, with
-   zero flicker. JS then updates each card's inline transform in
-   lock-step with scroll position.
-   Isolated on purpose: only touches #projects internals.
+   Projects — soft light grid with laptop-mockup cards.
+   Scoped entirely to #projects so the rest of the (dark) site
+   is untouched. Info panel reveals on hover/focus; screenshots
+   sit inside a CSS laptop bezel, unblurred and unscaled.
    =========================================================== */
 
-.projects-section { padding-bottom: 0; }
-
-/* Wrapper's height is set inline by JS (N * 100vh) so the scroll
-   distance always exactly matches the animation — no leftover
-   empty space, no extra whitespace below the deck. */
-.stack-wrap {
+.projects-section-light {
   position: relative;
+  overflow: hidden;
+  background: #151518;
+  padding: 96px 0 104px;
+}
+.projects-section-light::before {
+  content: '';
+  position: absolute;
+  top: -16%; right: -12%;
+  width: 46%; height: 58%;
+  background: #242428;
+  clip-path: polygon(34% 0, 100% 0, 100% 100%, 0 62%);
+}
+.projects-section-light::after {
+  content: '';
+  position: absolute;
+  left: 4%; top: 23%;
+  width: 42%; height: 1px;
+  background: rgba(242,241,236,.10);
+  transform: rotate(-13deg);
+  transform-origin: left center;
+}
+.projects-section-light > .container { position: relative; z-index: 1; }
+.projects-section-light .eyebrow { color: #9b8b70; text-transform: uppercase; letter-spacing: .10em; }
+.projects-section-light .eyebrow::before { color: #77777a; }
+.projects-section-light .section-title { color: #f2f1ec; }
+.projects-section-light .section-sub { color: #b8b8b5; }
+
+.proj-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 44px;
 }
 
-.stack-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+.proj-card {
+  position: relative;
+  border-radius: 2px;
   overflow: hidden;
+  aspect-ratio: 16 / 11;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 34px;
+  isolation: isolate;
+  background: #0b0b0d;
+  border: 1px solid #303035;
+  box-shadow: 0 18px 34px -28px rgba(0,0,0,.78);
+  transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
 }
+.proj-card:first-child {
+  grid-column: 1 / -1;
+  aspect-ratio: 21 / 9;
+}
+.proj-card:nth-child(2) { aspect-ratio: 4 / 3; }
+.proj-card:nth-child(3) { aspect-ratio: 16 / 10; }
 
-.stack-card {
+/* restrained charcoal layers keep the dark grid from looking flat */
+.proj-card::before,
+.proj-card::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  margin: auto;
-  width: min(760px, 88vw);
-  aspect-ratio: 16 / 10;
-  height: auto;
-  max-height: 74vh;
-  border-radius: var(--radius-lg);
-  background: var(--ink-surface, #16180f);
-  border: 1px solid var(--border-strong);
-  box-shadow: 0 40px 80px -30px rgba(0,0,0,.55);
-  overflow: hidden;
-  will-change: transform, opacity, filter;
-  transform-origin: center bottom;
+  border-radius: 0;
   pointer-events: none;
+  transition: transform .35s ease, border-color .35s ease, opacity .35s ease;
 }
-
-/* Default resting stack pose (progress = 0), one entry per card so
-   the deck already looks correct before JS boots — this matches
-   exactly what the JS computes for progress 0, so there is no jump. */
-.stack-card[data-index="0"] { transform: translateY(0)     scale(1);    opacity: 1;    z-index: 40; pointer-events: auto; }
-.stack-card[data-index="1"] { transform: translateY(14px)  scale(.96);  opacity: .92;  z-index: 30; }
-.stack-card[data-index="2"] { transform: translateY(27px)  scale(.92);  opacity: .76;  z-index: 20; }
-.stack-card[data-index="3"] { transform: translateY(38px)  scale(.885); opacity: .56;  z-index: 10; }
-.stack-card[data-index="4"] { transform: translateY(47px)  scale(.85);  opacity: .36;  z-index: 0;  }
-
-.stack-card.is-front { pointer-events: auto; }
-
-.stack-card-num {
-  position: absolute;
-  top: 18px; left: 20px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--accent);
-  letter-spacing: .08em;
-  z-index: 2;
-  text-shadow: 0 2px 10px rgba(0,0,0,.6);
+.proj-card::before {
+  inset: 16px 18px 24px;
+  z-index: 0;
+  background: #151518;
+  border: 1px solid #303035;
+  clip-path: polygon(0 0, 92% 0, 100% 20%, 100% 100%, 0 100%);
+  transform: translate(8px, 8px) scale(.97);
 }
+.proj-card::after {
+  inset: 30px 34px 38px;
+  z-index: 1;
+  background: #242428;
+  opacity: .66;
+  clip-path: polygon(8% 0, 100% 0, 100% 82%, 92% 100%, 0 100%, 0 18%);
+  transform: translate(-6px, 11px) scale(.94);
+}
+.proj-pastel-a,
+.proj-pastel-b,
+.proj-pastel-c { background: #0b0b0d; }
+.proj-card:hover {
+  border-color: #77777a;
+  box-shadow: 0 24px 44px -30px rgba(0,0,0,.82);
+  transform: translateY(-2px);
+}
+.proj-card:hover::before { transform: translate(4px, 4px) scale(.975); border-color: #45454a; }
+.proj-card:hover::after { transform: translate(-3px, 7px) scale(.945); opacity: .82; }
 
-.stack-card-media {
-  position: relative;
-  width: 100%;
-  height: 100%;
+/* -------- laptop mockup, pure CSS -------- */
+.proj-laptop { width: min(82%, 480px); position: relative; z-index: 2; }
+.proj-laptop-screen {
+  background: #0b0b0d;
+  border-radius: 2px 2px 0 0;
+  padding: 8px;
+  aspect-ratio: 16 / 10.2;
   overflow: hidden;
-  background: #0e0f0a;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,.62);
 }
-.stack-card-media img {
+.proj-laptop-screen img {
   width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: top;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0;
   display: block;
-  transition: transform .6s ease;
 }
-.stack-card:hover .stack-card-media img { transform: scale(1.04); }
+.proj-laptop-base {
+  height: 12px;
+  margin: 0 -4%;
+  background: #45454a;
+  border-radius: 0 0 2px 2px;
+  position: relative;
+}
+.proj-laptop-base::after {
+  content: '';
+  position: absolute; left: 50%; top: 0;
+  transform: translateX(-50%);
+  width: 56px; height: 5px;
+  background: #151518;
+  border-radius: 0 0 6px 6px;
+}
 
-/* Info now lives in an overlay that appears only on hover/focus —
-   it never occupies its own row/column, so it can't affect layout
-   or the card's size. */
-.stack-card-overlay {
-  position: absolute;
-  inset: 0;
+/* -------- hover info overlay -------- */
+.proj-info {
+  position: absolute; inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   gap: 10px;
-  padding: 28px;
-  background: linear-gradient(180deg, rgba(6,8,4,0) 0%, rgba(6,8,4,.35) 45%, rgba(6,8,4,.92) 100%);
+  padding: 30px;
+  z-index: 3;
+  background: linear-gradient(180deg, rgba(11,11,13,0) 0%, rgba(11,11,13,.60) 42%, rgba(11,11,13,.98) 100%);
   opacity: 0;
   transform: translateY(10px);
   transition: opacity .3s ease, transform .3s ease;
   pointer-events: none;
 }
-.stack-card:hover .stack-card-overlay,
-.stack-card:focus-within .stack-card-overlay {
+.proj-card:hover .proj-info,
+.proj-card:focus-within .proj-info {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
-
-.stack-card-overlay h3 { font-size: 20px; color: var(--text); margin: 0; }
-
-.stack-card-desc {
-  color: var(--text-dim);
-  font-size: 14px;
-  line-height: 1.55;
-  margin: 0;
-}
-
-.stack-card-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.stack-card-tags span {
+.proj-info h3 { font-size: 20px; color: #f2f1ec; margin: 0; }
+.proj-desc { color: #b8b8b5; font-size: 14px; line-height: 1.55; margin: 0; }
+.proj-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.proj-tags span {
   font-size: 11px; font-family: 'JetBrains Mono', monospace;
-  color: var(--text-dim); border: 1px solid var(--border);
-  border-radius: 999px; padding: 4px 10px;
+  color: #b8b8b5; border: 1px solid #303035;
+  border-radius: 0; padding: 4px 10px;
 }
-
-.stack-card-cta {
+.proj-cta {
   margin-top: 2px;
   display: inline-flex; align-items: center; gap: 8px;
   width: fit-content;
   font-size: 13px; font-weight: 600;
-  color: var(--accent);
-  border-bottom: 1px solid var(--accent);
+  color: #f2f1ec;
+  border-bottom: 1px solid #77777a;
   padding-bottom: 2px;
   transition: gap .25s ease, opacity .2s ease;
 }
-.stack-card-cta:hover { gap: 13px; }
-.stack-card[data-status="dev"] .stack-card-cta { color: var(--text-faint); border-color: var(--border-strong); cursor: default; }
-
-.stack-progress {
-  position: absolute;
-  right: max(24px, 4vw);
-  top: 50%; transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 10px;
-  z-index: 50;
-}
-.stack-progress-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--border-strong);
-  transition: background .25s ease, transform .25s ease;
-}
-.stack-progress-dot.active { background: var(--accent); transform: scale(1.6); }
+.proj-cta:hover { gap: 13px; }
+.proj-card[data-status="dev"] .proj-cta { color: #77777a; border-color: #303035; cursor: default; }
 
 @media (max-width: 860px) {
-  .stack-card { width: 92vw; aspect-ratio: 4 / 3.4; max-height: 70vh; }
-  .stack-card-overlay { padding: 20px; gap: 8px; }
-  .stack-card-overlay h3 { font-size: 17px; }
-  .stack-card-desc { font-size: 13px; }
-  .stack-progress { right: 10px; }
+  .proj-grid { grid-template-columns: 1fr; gap: 20px; }
+  .proj-card,
+  .proj-card:first-child,
+  .proj-card:nth-child(2),
+  .proj-card:nth-child(3) { grid-column: auto; aspect-ratio: 4 / 3.3; padding: 24px; }
+  .projects-section-light::before { width: 65%; height: 34%; opacity: .7; }
+  .projects-section-light::after { display: none; }
+  .proj-info { padding: 22px; gap: 8px; }
+  .proj-info h3 { font-size: 17px; }
+  .proj-desc { font-size: 13px; }
+}
+
+@media (max-width: 520px) {
+  .proj-card::before { inset: 12px 12px 18px; }
+  .proj-card::after { inset: 22px 24px 28px; opacity: .48; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stack-card { transition: none !important; }
+  .proj-info { transition: none !important; }
+}
+
+/* Editorial project treatment: typography and clean blocks only. */
+.projects-section-light {
+  background: #1b1b1d;
+  padding: clamp(92px, 11vw, 150px) 0 112px;
+}
+.projects-section-light::before,
+.projects-section-light::after,
+.proj-card::before,
+.proj-card::after { display: none; }
+.projects-section-light .section-head {
+  margin-bottom: clamp(48px, 7vw, 86px);
+}
+.projects-editorial-title {
+  margin: 0;
+  color: #f3f0e8 !important;
+  font-family: 'Anton', 'Arial Narrow', Impact, sans-serif;
+  font-size: clamp(76px, 13.5vw, 196px) !important;
+  font-weight: 400 !important;
+  line-height: .82;
+  letter-spacing: -.035em !important;
+  white-space: nowrap;
+}
+.proj-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 0;
+}
+.proj-card,
+.proj-card:first-child,
+.proj-card:nth-child(2),
+.proj-card:nth-child(3) {
+  grid-column: auto;
+  aspect-ratio: 16 / 11;
+  padding: 30px;
+  background: #242428;
+  border: 1px solid rgba(243,240,232,.10);
+  border-radius: 0;
+  box-shadow: 0 18px 36px -28px rgba(0,0,0,.78);
+}
+.proj-card:hover {
+  border-color: rgba(243,240,232,.34);
+  box-shadow: 0 22px 42px -30px rgba(0,0,0,.86);
+}
+.proj-laptop { width: min(88%, 520px); }
+.proj-laptop-screen {
+  background: #111111;
+  border-radius: 0;
+  box-shadow: 0 14px 26px -16px rgba(0,0,0,.76);
+}
+.proj-laptop-screen img {
+  object-fit: contain;
+  object-position: center;
+  background: #111111;
+}
+.proj-laptop-base {
+  background: #56565a;
+  border-radius: 0;
+}
+.proj-laptop-base::after { background: #242428; }
+.proj-info {
+  background: linear-gradient(180deg, rgba(27,27,29,0) 0%, rgba(27,27,29,.64) 40%, rgba(27,27,29,.98) 100%);
+}
+.proj-info h3 { color: #f8f8f8; }
+.proj-desc { color: #b8b8b5; }
+.proj-tags span { color: #b8b8b5; border-color: rgba(243,240,232,.16); }
+.proj-cta { color: #f3f0e8; border-color: rgba(243,240,232,.56); }
+
+@media (max-width: 860px) {
+  .projects-editorial-title { white-space: normal; font-size: clamp(64px, 18vw, 124px) !important; }
+  .proj-grid { grid-template-columns: 1fr; }
+  .proj-card,
+  .proj-card:first-child,
+  .proj-card:nth-child(2),
+  .proj-card:nth-child(3) { aspect-ratio: 4 / 3.25; padding: 24px; }
+}
+
+@media (max-width: 480px) {
+  .projects-editorial-title { font-size: clamp(52px, 17vw, 76px) !important; }
+}
+
+/* Premium editorial card refinement. */
+.projects-editorial-title {
+  width: 100%;
+  font-size: clamp(82px, 13.8vw, 204px) !important;
+  line-height: .80;
+  letter-spacing: -.04em !important;
+  transform: scaleX(.92);
+  transform-origin: left center;
+}
+.proj-grid {
+  counter-reset: portfolio-project;
+  gap: 28px;
+}
+.proj-card,
+.proj-card:first-child,
+.proj-card:nth-child(2),
+.proj-card:nth-child(3) {
+  counter-increment: portfolio-project;
+  padding: 38px;
+  background: #202023;
+  border-color: rgba(243,240,232,.13);
+  box-shadow: 0 20px 44px -32px rgba(0,0,0,.9);
+  transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+.proj-card::before {
+  content: '0' counter(portfolio-project);
+  display: block;
+  position: absolute;
+  inset: 18px auto auto 20px;
+  z-index: 4;
+  width: auto; height: auto;
+  color: rgba(243,240,232,.52);
+  background: none;
+  border: none;
+  border-radius: 0;
+  clip-path: none;
+  transform: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .10em;
+  pointer-events: none;
+}
+.proj-card::after { display: none; }
+.proj-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(243,240,232,.38);
+  box-shadow: 0 30px 58px -34px rgba(0,0,0,.96);
+}
+.proj-card:hover::before {
+  transform: none;
+  border: none;
+  color: #f3f0e8;
+}
+.proj-laptop {
+  width: min(91%, 540px);
+  transition: transform .45s cubic-bezier(.22,.9,.3,1);
+}
+.proj-card:hover .proj-laptop { transform: translateY(-4px) scale(1.015); }
+.proj-laptop-screen {
+  padding: 7px;
+  border: 1px solid rgba(243,240,232,.12);
+  box-shadow: 0 18px 34px -18px rgba(0,0,0,.9);
+}
+.proj-info {
+  gap: 11px;
+  padding: 34px;
+  background: linear-gradient(180deg, rgba(17,17,17,0) 0%, rgba(17,17,17,.58) 34%, rgba(17,17,17,.98) 100%);
+}
+.proj-info h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+.proj-desc { max-width: 520px; }
+.proj-tags { gap: 6px; }
+.proj-cta { margin-top: 5px; letter-spacing: .02em; }
+
+@media (max-width: 860px) {
+  .projects-editorial-title { font-size: clamp(68px, 18vw, 132px) !important; transform: none; }
+  .proj-card,
+  .proj-card:first-child,
+  .proj-card:nth-child(2),
+  .proj-card:nth-child(3) { padding: 28px; }
+}
+
+@media (max-width: 480px) {
+  .projects-editorial-title { font-size: clamp(56px, 17.5vw, 82px) !important; }
+  .proj-grid { gap: 18px; }
+  .proj-card,
+  .proj-card:first-child,
+  .proj-card:nth-child(2),
+  .proj-card:nth-child(3) { padding: 22px; }
+  .proj-info { padding: 24px; }
+}
+
+/* ==================================================================
+   Expandable project rail
+   Equal panels at rest; hover, focus or touch activation promotes one.
+   ================================================================== */
+.proj-grid {
+  display: flex;
+  width: 100%;
+  height: clamp(390px, 40vw, 500px);
+  gap: 8px;
+  overflow: hidden;
+}
+.proj-card,
+.proj-card:first-child,
+.proj-card:nth-child(2),
+.proj-card:nth-child(3) {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  aspect-ratio: auto;
+  padding: 0;
+  overflow: hidden;
+  transform: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: flex-grow .68s cubic-bezier(.22,.9,.3,1), border-color .35s ease, box-shadow .35s ease;
+}
+.proj-grid:has(.proj-card:hover) .proj-card,
+.proj-grid:has(.proj-card:focus-within) .proj-card,
+.proj-grid.has-active .proj-card { flex-grow: .52; }
+.proj-grid .proj-card:hover,
+.proj-grid .proj-card:focus-within,
+.proj-grid.has-active .proj-card.is-active {
+  flex-grow: 6;
+  transform: none;
+  border-color: rgba(243,240,232,.38);
+  box-shadow: 0 26px 48px -30px rgba(0,0,0,.96);
+}
+.proj-card::before {
+  inset: 18px auto auto 18px;
+  color: rgba(243,240,232,.66);
+}
+.proj-laptop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
+.proj-card:hover .proj-laptop,
+.proj-card:focus-within .proj-laptop,
+.proj-card.is-active .proj-laptop { transform: none; }
+.proj-laptop-screen {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  aspect-ratio: auto;
+  border: 0;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.proj-laptop-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #111111;
+  max-width: 100%;
+  max-height: 100%;
+  transition: transform .7s cubic-bezier(.22,.9,.3,1), filter .4s ease;
+}
+.proj-laptop-base { display: none; }
+.proj-card:hover .proj-laptop-screen img,
+.proj-card:focus-within .proj-laptop-screen img,
+.proj-card.is-active .proj-laptop-screen img {
+  object-fit: contain;
+  object-position: center;
+  background: #111111;
+}
+.proj-card .proj-laptop-screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Fill every project block without sacrificing the complete screenshot:
+   a soft edge-to-edge copy removes letterbox voids while the sharp image
+   above remains proportionally contained and fully visible. */
+.proj-laptop-screen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.proj-laptop-screen::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  z-index: 0;
+  background-image: linear-gradient(rgba(11,11,13,.28), rgba(11,11,13,.28)), var(--project-image);
+  background-position: center;
+  background-size: cover;
+  filter: blur(10px) saturate(.8);
+  transform: scale(1.05);
+}
+.proj-card .proj-laptop-screen img {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+.proj-card:hover .proj-laptop-screen img,
+.proj-card:focus-within .proj-laptop-screen img,
+.proj-card.is-active .proj-laptop-screen img { background: transparent; }
+.proj-info {
+  z-index: 5;
+  opacity: 1;
+  transform: none;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 24px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(17,17,17,0) 34%, rgba(17,17,17,.12) 52%, rgba(17,17,17,.94) 100%);
+}
+.proj-info h3 {
+  align-self: flex-start;
+  margin: 0;
+  font-size: clamp(17px, 1.7vw, 24px);
+  line-height: 1;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  transition: transform .45s ease, font-size .45s ease;
+}
+.proj-desc,
+.proj-tags,
+.proj-cta {
+  max-height: 0;
+  margin: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s ease .08s, transform .4s ease .08s, max-height .45s ease;
+}
+.proj-card:hover .proj-info,
+.proj-card:focus-within .proj-info,
+.proj-card.is-active .proj-info { pointer-events: auto; }
+.proj-card:hover .proj-info h3,
+.proj-card:focus-within .proj-info h3,
+.proj-card.is-active .proj-info h3 {
+  font-size: clamp(24px, 3vw, 38px);
+  writing-mode: horizontal-tb;
+  transform: none;
+  white-space: normal;
+}
+.proj-card:hover .proj-desc,
+.proj-card:hover .proj-tags,
+.proj-card:hover .proj-cta,
+.proj-card:focus-within .proj-desc,
+.proj-card:focus-within .proj-tags,
+.proj-card:focus-within .proj-cta,
+.proj-card.is-active .proj-desc,
+.proj-card.is-active .proj-tags,
+.proj-card.is-active .proj-cta {
+  max-height: 120px;
+  opacity: 1;
+  transform: none;
+}
+.proj-card:hover .proj-tags,
+.proj-card:focus-within .proj-tags,
+.proj-card.is-active .proj-tags { display: flex; }
+.proj-card:hover .proj-cta,
+.proj-card:focus-within .proj-cta,
+.proj-card.is-active .proj-cta { display: inline-flex; margin-top: 4px; }
+.proj-card[data-status="live"] .proj-cta[aria-disabled="true"] {
+  opacity: .52;
+  cursor: not-allowed;
+}
+
+@media (max-width: 860px) {
+  .proj-grid {
+    display: flex;
+    grid-template-columns: none;
+    height: clamp(390px, 108vw, 500px);
+    gap: 5px;
+  }
+  .proj-card,
+  .proj-card:first-child,
+  .proj-card:nth-child(2),
+  .proj-card:nth-child(3) {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    aspect-ratio: auto;
+    padding: 0;
+  }
+  .proj-grid.has-active .proj-card { flex-grow: .34; }
+  .proj-grid.has-active .proj-card.is-active { flex-grow: 7; }
+  .proj-info { padding: 18px 14px; }
+  .proj-info h3 { font-size: 15px; }
+  .proj-card.is-active .proj-info h3 { font-size: clamp(24px, 8vw, 36px); }
+}
+
+@media (max-width: 480px) {
+  .proj-grid { height: 410px; gap: 4px; }
+  .proj-card::before { inset: 12px auto auto 10px; font-size: 9px; }
+  .proj-info { padding: 16px 10px; }
+  .proj-card.is-active .proj-info { padding: 22px; }
+  .proj-card.is-active .proj-desc { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proj-card,
+  .proj-laptop-screen img,
+  .proj-info h3,
+  .proj-desc,
+  .proj-tags,
+  .proj-cta { transition: none !important; }
 }

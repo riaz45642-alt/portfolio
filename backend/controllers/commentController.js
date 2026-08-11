@@ -47,17 +47,19 @@ const getComments = async (req, res) => {
 const addComment = async (req, res) => {
   const { name, company, email, message, parent_id } = req.body || {};
 
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Name, email, and message are required.' });
+  if (!message || !message.trim()) {
+    return res.status(400).json({ error: 'A message is required.' });
   }
-  if (!emailRegex.test(email)) {
+  const safeName = (name && name.trim()) || 'Anonymous';
+  const safeEmail = (email && email.trim()) || 'anonymous@portfolio.visitor';
+  if (!emailRegex.test(safeEmail)) {
     return res.status(400).json({ error: 'Invalid email address.' });
   }
 
   try {
     const { rows: inserted } = await pool.query(
       'INSERT INTO comments (parent_id, name, company, email, message) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-      [parent_id || null, name, company || null, email, message]
+      [parent_id || null, safeName, company || null, safeEmail, message]
     );
     res.status(201).json({ success: true, comment: normalize(inserted[0]) });
   } catch (err) {
