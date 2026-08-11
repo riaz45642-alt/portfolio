@@ -352,119 +352,139 @@ function initLikes() {
 }
 
 /* ---------------------------------------------------------------
-   Projects (GET /api/projects, fallback to seed data) — unchanged
+   Projects — layered/stacked scroll showcase.
+   Pure scroll-linked animation (no external animation library, no
+   CDN dependency, no async-load race) so the deck's very first
+   paint already matches the JS-driven state exactly — no flicker,
+   no flash of an "already opened" layout.
+
+   Mental model: the wrapper (#stackWrap) is tall enough to give
+   exactly (cards.length - 1) full-viewport steps of scroll room.
+   The inner .stack-sticky pins itself via native `position:sticky`
+   while the user scrolls through that room. On every scroll/resize
+   tick we compute a single 0..1 progress value from the wrapper's
+   position, translate that into a continuous "depth" per card
+   (depth = card index - progress * (N - 1)), and map depth straight
+   to a transform/opacity/blur pose:
+     depth  0        -> fully open, front of the stack
+     depth  1,2,3...  -> further back in the stacked deck (peeking)
+     depth -1         -> already opened and gliding out of view
+   Because this is a continuous function of scroll position (not a
+   discrete step triggered once per section), cards reveal exactly
+   one at a time, in lock-step with the scrollbar, and reverse
+   cleanly when scrolling back up.
    --------------------------------------------------------------- */
-function initProjects() {
-  const grid = document.getElementById('projectsGrid');
-  if (!grid) return;
+function initProjectsStack() {
+  const wrap = document.getElementById('stackWrap');
+  const sticky = document.querySelector('.stack-sticky');
+  const cards = [...document.querySelectorAll('.stack-card')];
+  const dots = [...document.querySelectorAll('.stack-progress-dot')];
+  if (!wrap || !sticky || !cards.length) return;
 
-  const fallbackProjects = [{
-    id: 1,
-    title: 'Job Portal & Combined CV Generator',
-    description: 'A fully responsive job portal built with Node.js, TiDB Cloud, Firebase Authentication, and Cloudflare Pages — featuring Job Seeker and Employer dashboards with an integrated CV generator.',
-    tags: ['HTML', 'CSS', 'JavaScript', 'Node.js', 'Firebase'],
-    category: 'fullstack',
-    featured: true,
-    icon: 'fas fa-briefcase',
-    github: 'https://github.com/riaz45642-alt',
-    demo: 'https://talentbridge-2o9.pages.dev',
-    images: ['assets/landingpage.png', 'assets/jobseekerpage.png', 'assets/employerpage.png', 'assets/cvgeneratorpage.png']
-  }];
+  const N = cards.length;
+  setStat('statProjects', String(N).padStart(3, '0'));
 
-  let allProjects = [];
-  let currentFilter = 'all';
-  let sliderIntervals = [];
-
-  function clearSliders() {
-    sliderIntervals.forEach(clearInterval);
-    sliderIntervals = [];
-  }
-
-  async function loadProjects() {
-    try {
-      const res = await fetch(`${API_BASE}/projects`);
-      if (!res.ok) throw new Error('API not available');
-      allProjects = await res.json();
-      if (!allProjects.length) allProjects = fallbackProjects;
-    } catch {
-      allProjects = fallbackProjects;
-    }
-    setStat('statProjects', String(allProjects.length).padStart(3, '0'));
-    renderProjects();
-  }
-
-  function initSlider(card) {
-    const slides = card.querySelectorAll('.project-slide');
-    const dots = card.querySelectorAll('.project-slider-dot');
-    let current = 0;
-    if (slides.length < 2) return;
-    const interval = setInterval(() => {
-      slides[current].style.opacity = '0';
-      slides[current].classList.remove('active');
-      dots[current]?.classList.remove('active');
-      current = (current + 1) % slides.length;
-      slides[current].style.opacity = '1';
-      slides[current].classList.add('active');
-      dots[current]?.classList.add('active');
-    }, 3500);
-    sliderIntervals.push(interval);
-  }
-
-  function renderProjects() {
-    const filtered = currentFilter === 'all' ? allProjects : allProjects.filter((p) => p.category === currentFilter);
-    clearSliders();
-
-    if (!filtered.length) {
-      grid.innerHTML = `<div class="loading-spinner"><i class="fas fa-folder-open" style="color:var(--accent);animation:none"></i>No projects in this category yet.</div>`;
-      return;
-    }
-
-    grid.innerHTML = '';
-    filtered.forEach((project, i) => {
-      const images = project.images && project.images.length ? project.images : null;
-      const card = document.createElement('div');
-      card.className = 'project-card scroll-reveal';
-      card.setAttribute('data-reveal', 'tilt');
-      card.style.transitionDelay = `${i * 0.08}s`;
-
-      let thumbInner;
-      if (images) {
-        const badge = project.featured ? `<span class="featured-badge">Featured</span>` : '';
-        const slides = images.map((src, idx) => `<img src="${src}" class="project-slide${idx === 0 ? ' active' : ''}" alt="${project.title} screenshot ${idx + 1}" loading="lazy" style="width:100%;height:100%;object-fit:contain;background:#1A1C18;${idx === 0 ? 'position:relative;' : 'position:absolute;top:0;left:0;'}opacity:${idx === 0 ? '1' : '0'};transition:opacity .7s ease;" />`).join('');
-        const dots = images.length > 1 ? `<div class="project-slider-dots">${images.map((_, idx) => `<span class="project-slider-dot${idx === 0 ? ' active' : ''}"></span>`).join('')}</div>` : '';
-        thumbInner = `${badge}<div class="project-slider" style="position:relative;width:100%;height:220px;">${slides}</div>${dots}`;
-      } else {
-        thumbInner = `<div style="display:flex;align-items:center;justify-content:center;height:280px;font-size:3em;color:var(--accent);"><i class="${project.icon || 'fas fa-code'}"></i></div>`;
-      }
-
-      card.innerHTML = `
-        <div class="project-thumb">${thumbInner}</div>
-        <div class="project-body">
-          <h3>${project.title}</h3>
-          <p>${project.description}</p>
-          <div class="project-tags">${(project.tags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
-          <div class="project-links">
-            <a href="${project.github || '#'}" class="btn-link secondary" target="_blank" rel="noopener"><i class="fab fa-github"></i> Code</a>
-            <a href="${project.demo || '#'}" class="btn-link primary" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Live</a>
-          </div>
-        </div>`;
-      grid.appendChild(card);
-      if (images && images.length > 1) initSlider(card);
-    });
-
-    initScrollReveal();
-  }
-
-  document.querySelectorAll('.filter-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      renderProjects();
-    });
+  // status -> CTA label/href placeholder (real URLs added later by hand)
+  cards.forEach((card) => {
+    const status = card.dataset.status;
+    const cta = card.querySelector('.stack-card-cta');
+    const label = cta?.querySelector('.cta-label');
+    if (!cta || !label) return;
+    if (status === 'live' && card.dataset.live) { cta.href = card.dataset.live; label.textContent = 'View Live'; }
+    else if (status === 'github' && card.dataset.github) { cta.href = card.dataset.github; label.textContent = 'View on GitHub'; }
+    else { cta.removeAttribute('href'); cta.addEventListener('click', (e) => e.preventDefault()); }
   });
 
-  loadProjects();
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Control points mapping "depth" (card index minus scroll progress)
+  // to a visual pose. depth 0 = open/front card. Positive depth =
+  // stacked further back (still visible, peeking). Negative depth =
+  // already shown and exiting. These exact numbers are mirrored in
+  // the default CSS ([data-index] rules) so first paint == JS state.
+  const POSES = [
+    { d: -1, ty: -46, scale: 1.06, opacity: 0,   blur: 8 },
+    { d: 0,  ty: 0,   scale: 1,    opacity: 1,   blur: 0 },
+    { d: 1,  ty: 14,  scale: .96,  opacity: .92, blur: 0 },
+    { d: 2,  ty: 27,  scale: .92,  opacity: .76, blur: 0 },
+    { d: 3,  ty: 38,  scale: .885, opacity: .56, blur: 0 },
+    { d: 4,  ty: 47,  scale: .85,  opacity: .36, blur: 0 }
+  ];
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const smooth = (t) => t * t * (3 - 2 * t);
+
+  function poseAt(depth) {
+    const dc = Math.min(Math.max(depth, POSES[0].d), POSES[POSES.length - 1].d);
+    let lo = POSES[0], hi = POSES[POSES.length - 1];
+    for (let k = 0; k < POSES.length - 1; k++) {
+      if (dc >= POSES[k].d && dc <= POSES[k + 1].d) { lo = POSES[k]; hi = POSES[k + 1]; break; }
+    }
+    const span = (hi.d - lo.d) || 1;
+    const t = smooth((dc - lo.d) / span);
+    return {
+      ty: lerp(lo.ty, hi.ty, t),
+      scale: lerp(lo.scale, hi.scale, t),
+      opacity: lerp(lo.opacity, hi.opacity, t),
+      blur: lerp(lo.blur, hi.blur, t)
+    };
+  }
+
+  // Wrapper height = exactly the scroll room the animation needs:
+  // one viewport to arrive + (N - 1) viewports to step through the
+  // rest, so there is never leftover empty space above/below the
+  // pinned deck. Recalculated on resize.
+  function sizeWrap() {
+    wrap.style.height = `${N * 100}vh`;
+  }
+  sizeWrap();
+
+  let ticking = false;
+
+  function render() {
+    ticking = false;
+    const vh = window.innerHeight;
+    const rect = wrap.getBoundingClientRect();
+    const scrollable = wrap.offsetHeight - vh;
+    let progress = scrollable > 0 ? (-rect.top) / scrollable : 0;
+    progress = Math.min(1, Math.max(0, progress));
+
+    const activeFloat = progress * (N - 1);
+    const activeIndex = Math.round(activeFloat);
+
+    cards.forEach((card, i) => {
+      const depth = i - activeFloat;
+      const pose = reduced
+        ? (depth <= -0.5 ? POSES[0] : (i === activeIndex ? POSES[1] : POSES[Math.min(POSES.length - 1, Math.max(1, Math.round(depth) + 1))]))
+        : poseAt(depth);
+
+      card.style.transform = `translateY(${pose.ty.toFixed(2)}px) scale(${pose.scale.toFixed(3)})`;
+      card.style.opacity = pose.opacity.toFixed(3);
+      card.style.filter = pose.blur > 0.4 ? `blur(${pose.blur.toFixed(1)}px)` : 'none';
+
+      const dc = Math.min(Math.max(depth, POSES[0].d), POSES[POSES.length - 1].d);
+      card.style.zIndex = String(Math.round((4 - dc) * 10) + 10);
+
+      // Only the front-most (and its immediate peeking neighbor)
+      // should be interactive/hoverable — deeper or exited cards
+      // sit behind and shouldn't intercept pointer events.
+      const interactive = depth > -0.5 && depth < 1.5;
+      card.style.pointerEvents = interactive ? 'auto' : 'none';
+      card.classList.toggle('is-front', i === activeIndex);
+    });
+
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIndex));
+  }
+
+  function requestRender() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(render);
+  }
+
+  window.addEventListener('scroll', requestRender, { passive: true });
+  window.addEventListener('resize', () => { sizeWrap(); requestRender(); });
+
+  render(); // paint the correct initial state immediately (matches default CSS)
 }
 
 /* ---------------------------------------------------------------
@@ -650,6 +670,41 @@ function initComments() {
    POST to /api/contact so the message is logged in the database;
    this never blocks or affects the WhatsApp flow.
    --------------------------------------------------------------- */
+/* ---------------------------------------------------------------
+   Contact — cinematic photo drop, scroll-scrubbed via GSAP.
+   The photo starts high, rotated and scaled down, and settles into
+   its resting spot as the Contact section scrolls into view — a
+   layered, physical-feeling reveal rather than a plain fade-in.
+   --------------------------------------------------------------- */
+function initContactPhotoDrop() {
+  const photo = document.getElementById('contactPhotoDrop');
+  const section = document.getElementById('contact');
+  if (!photo || !section || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { gsap.set(photo, { opacity: .9, rotate: -4, y: 0, scale: 1 }); return; }
+
+  gsap.fromTo(photo,
+    { y: '-30%', rotate: -9, scale: .82, opacity: 0 },
+    {
+      y: '0%', rotate: -4, scale: 1, opacity: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: section,
+        start: 'top 85%',
+        end: 'top 25%',
+        scrub: 0.8
+      }
+    });
+
+  // tiny parallax drift while the section is in view — adds depth
+  gsap.to(photo, {
+    y: '+=18',
+    ease: 'none',
+    scrollTrigger: { trigger: section, start: 'top top', end: 'bottom top', scrub: 1 }
+  });
+}
+
 function initContactForm() {
   const submitBtn = document.getElementById('contactSubmitBtn');
   if (!submitBtn) return;
@@ -698,9 +753,9 @@ function initContactForm() {
    --------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   const boot = [
-    initNav, initClock, initLikes, initHeroLetterRain, initSkills, initProjects,
-    initComments, initContactForm, initSplitText, initParallax, initScrollReveal,
-    initAboutLetterRain, initSmoothScroll, initCardTilt, initStatCounters
+    initNav, initClock, initLikes, initHeroLetterRain, initSkills, initProjectsStack,
+    initComments, initContactForm, initContactPhotoDrop, initSplitText, initParallax, initScrollReveal,
+    initAboutLetterRain, initSmoothScroll, initStatCounters
   ];
   boot.forEach((fn) => {
     try { fn(); } catch (err) { console.error(`[portfolio] ${fn.name} failed:`, err); }

@@ -7,6 +7,7 @@
 <meta name="description" content="Portfolio of Muhammad Ahmad, a frontend developer building clean, fast, user-friendly web experiences.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style-projects.css">
 </head>
 <body>
 
@@ -99,23 +100,85 @@
     </div>
   </section>
 
-  <!-- ============ PROJECTS / WORK ============ -->
-  <section id="projects" class="section theme-dark">
+  <!-- ============ PROJECTS / WORK — layered stack ============ -->
+  <section id="projects" class="section theme-dark projects-section">
     <div class="container">
       <div class="section-head scroll-reveal">
         <div>
           <div class="eyebrow">work</div>
+          <h2 class="section-title">Selected work</h2>
+          <p class="section-sub">Scroll through — each project stacks forward as the last moves on.</p>
         </div>
       </div>
+    </div>
 
-      <div class="projects-filter scroll-reveal">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="frontend">Frontend</button>
-        <button class="filter-btn" data-filter="fullstack">Full stack</button>
-      </div>
+    <div class="stack-wrap" id="stackWrap">
+      <div class="stack-sticky">
+        <div class="stack-progress" aria-hidden="true">
+          <span class="stack-progress-dot" data-i="0"></span>
+          <span class="stack-progress-dot" data-i="1"></span>
+          <span class="stack-progress-dot" data-i="2"></span>
+          <span class="stack-progress-dot" data-i="3"></span>
+          <span class="stack-progress-dot" data-i="4"></span>
+        </div>
 
-      <div class="projects-grid" id="projectsGrid">
-        <div class="loading-spinner"><i class="fas fa-spinner"></i> Loading projects…</div>
+        <!-- data-live / data-github left empty on purpose — fill in later.
+             data-status: "live" | "github" | "dev" controls the placeholder CTA label.
+             Project info now lives in .stack-card-overlay, revealed on hover/focus only. -->
+        <article class="stack-card" data-index="0" data-status="dev" data-live="" data-github="">
+          <span class="stack-card-num">01</span>
+          <div class="stack-card-media"><img src="assets/portfolio-preview.webp" alt="Personal Portfolio screenshot" loading="lazy"></div>
+          <div class="stack-card-overlay">
+            <h3>Personal Portfolio</h3>
+            <p class="stack-card-desc">A personal portfolio website focused on frontend development, showcasing projects, skills, experience, and professional work.</p>
+            <div class="stack-card-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+            <a class="stack-card-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="stack-card" data-index="1" data-status="live" data-live="" data-github="">
+          <span class="stack-card-num">02</span>
+          <div class="stack-card-media"><img src="assets/talentbridge-preview.webp" alt="Talent Bridge screenshot" loading="lazy"></div>
+          <div class="stack-card-overlay">
+            <h3>Talent Bridge</h3>
+            <p class="stack-card-desc">A job portal connecting job seekers and employers, with dashboards for finding and managing employment opportunities — plus a built-in CV Generator.</p>
+            <div class="stack-card-tags"><span>Node.js</span><span>Firebase</span><span>TiDB Cloud</span></div>
+            <a class="stack-card-cta" href="#" data-link-slot><span class="cta-label">View Live</span> <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="stack-card" data-index="2" data-status="dev" data-live="" data-github="">
+          <span class="stack-card-num">03</span>
+          <div class="stack-card-media"><img src="assets/veyra-preview.webp" alt="AI E-Commerce virtual try-on screenshot" loading="lazy"></div>
+          <div class="stack-card-overlay">
+            <h3>AI E-Commerce — Virtual Try-On</h3>
+            <p class="stack-card-desc">A clothing e-commerce concept with AI/Gemini integration, letting users virtually preview how an item may look on them before buying.</p>
+            <div class="stack-card-tags"><span>AI / Gemini</span><span>E-commerce</span><span>UI/UX</span></div>
+            <a class="stack-card-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="stack-card" data-index="3" data-status="dev" data-live="" data-github="">
+          <span class="stack-card-num">04</span>
+          <div class="stack-card-media"><img src="assets/eventhooba-preview.webp" alt="Event Hooba screenshot" loading="lazy"></div>
+          <div class="stack-card-overlay">
+            <h3>Event Hooba</h3>
+            <p class="stack-card-desc">An event-sharing platform where users upload and publish events so others can discover and view what's happening around them.</p>
+            <div class="stack-card-tags"><span>Firebase</span><span>Realtime data</span><span>Mobile-first</span></div>
+            <a class="stack-card-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="stack-card" data-index="4" data-status="dev" data-live="" data-github="">
+          <span class="stack-card-num">05</span>
+          <div class="stack-card-media"><img src="assets/edusphere-preview.webp" alt="Education Sphere screenshot" loading="lazy"></div>
+          <div class="stack-card-overlay">
+            <h3>Education Sphere</h3>
+            <p class="stack-card-desc">An educational platform for uploading worksheets for young students, who can download, complete, and submit them back through the platform.</p>
+            <div class="stack-card-tags"><span>Worksheets</span><span>Student tracking</span><span>Web app</span></div>
+            <a class="stack-card-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -152,8 +215,11 @@
     </div>
   </section>
 
-  <!-- ============ CONTACT ============ -->
-  <section id="contact" class="section theme-dark">
+  <!-- ============ CONTACT — cinematic reveal + message area ============ -->
+  <section id="contact" class="section theme-dark contact-section">
+    <div class="contact-photo-drop" id="contactPhotoDrop" aria-hidden="true">
+      <img src="Gemini_Generated_Image_foqu3xfoqu3xfoqu.png" alt="">
+    </div>
     <div class="container">
       <div class="section-head scroll-reveal">
         <div>
@@ -185,13 +251,35 @@
           </div>
         </div>
 
-        <div class="card-panel scroll-reveal" data-reveal="right"></div>
+        <div class="card-panel contact-form-card scroll-reveal" data-reveal="right">
+          <h2>Send a message</h2>
           <div class="alert success" id="contactAlertSuccess"><i class="fas fa-check-circle"></i> Opening WhatsApp with your message…</div>
           <div class="alert error" id="contactAlertError"><i class="fas fa-exclamation-circle"></i> Please fill in your name, email, and message.</div>
+
+          <div class="form-row">
+            <div class="form-group"><label>First name *</label><input type="text" id="firstName" placeholder="Your first name"></div>
+            <div class="form-group"><label>Last name</label><input type="text" id="lastName" placeholder="Your last name"></div>
+          </div>
+          <div class="form-group"><label>Email *</label><input type="email" id="email" placeholder="you@example.com"></div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="subject">
+              <option value="">Select a subject</option>
+              <option value="project">Project Inquiry</option>
+              <option value="job">Job Opportunity</option>
+              <option value="general">General Question</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Message *</label><textarea id="message" placeholder="Tell me a bit about what you have in mind..."></textarea></div>
+          <button class="btn-submit" id="contactSubmitBtn"><i class="fas fa-paper-plane"></i> Send message</button>
+        </div>
       </div>
     </div>
   </section>
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
