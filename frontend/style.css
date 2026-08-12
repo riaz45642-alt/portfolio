@@ -292,6 +292,7 @@ main { transition: filter .18s ease-out; will-change: filter; }
   box-shadow: 0 8px 20px rgba(0,0,0,.28);
 }
 .nav-cta:hover { background: var(--accent-hover); color: #0b0b0d; border-color: var(--accent-hover); transform: translateY(-1px); }
+.nav-mobile-resume { display: none; }
 
 .nav-toggle {
   display: none; background: none; border: none; color: var(--ink-text);
@@ -2185,9 +2186,28 @@ main { transition: filter .18s ease-out; will-change: filter; }
   .nav-wrap { padding-inline: clamp(12px, 3vw, 20px); }
   .nav-pill {
     width: 100%;
-    padding: 0;
+    padding: 0 7px 0 10px;
     justify-content: flex-end;
+    gap: 5px;
   }
+  .nav-mobile-resume {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    margin-right: auto;
+    padding: 7px 14px;
+    border: 1px solid currentColor;
+    border-radius: 100px;
+    color: inherit;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    transition: color .3s ease, background-color .3s ease, border-color .3s ease, transform .2s ease;
+  }
+  .nav-mobile-resume:hover { transform: translateY(-1px); }
   .nav-toggle { display: flex; flex: 0 0 38px; }
   .nav-links {
     top: calc(var(--nav-h) + 8px);
@@ -2206,7 +2226,7 @@ main { transition: filter .18s ease-out; will-change: filter; }
     justify-content: flex-start;
     text-align: left;
   }
-  .nav-links .nav-cta { margin-top: 4px; }
+  .nav-links .nav-cta { display: none; }
 
   #feedback .feedback-layout { grid-template-columns: minmax(0, 1fr); }
   #feedback .feedback-mini-card { position: relative; top: auto; }
@@ -2214,6 +2234,17 @@ main { transition: filter .18s ease-out; will-change: filter; }
     font-size: clamp(44px, 15vw, 96px);
     white-space: nowrap;
   }
+}
+
+.nav-wrap.nav-on-light .nav-mobile-resume {
+  color: #f8f8f8;
+  background: #111111;
+  border-color: #111111;
+}
+.nav-wrap.nav-on-dark .nav-mobile-resume {
+  color: #111111;
+  background: #f3f0e8;
+  border-color: #f3f0e8;
 }
 
 @media (max-width: 520px) {
