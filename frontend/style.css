@@ -2397,6 +2397,58 @@ main { transition: filter .18s ease-out; will-change: filter; }
 #contact .contact-icon.map:hover,
 #contact .contact-icon.map:focus-visible { color: #ea4335; background: rgba(234,67,53,.10); }
 
+/* Keep the moving anchors above every decorative contact layer and stable
+   from pointer-down until their native click has been dispatched. */
+#contact .contact-icon-row,
+#contact .contact-icon { pointer-events: auto; }
+#contact .contact-icon {
+  z-index: 3;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#contact .contact-icon.is-interacting {
+  z-index: 8;
+  opacity: 1 !important;
+  visibility: visible !important;
+  animation-play-state: paused !important;
+  filter: drop-shadow(0 17px 22px rgb(0 0 0 / 34%));
+}
+#contact .contact-icon.wa.is-interacting { color: #25d366; background: rgba(37,211,102,.10); }
+#contact .contact-icon.ig.is-interacting { color: #e4405f; background: rgba(228,64,95,.10); }
+#contact .contact-icon.gh.is-interacting { color: #f5f5f5; background: rgba(245,245,245,.08); }
+#contact .contact-icon.em.is-interacting { color: #ea4335; background: rgba(234,67,53,.10); }
+#contact .contact-icon.li.is-interacting { color: #0a66c2; background: rgba(10,102,194,.13); }
+#contact .contact-icon.map.is-interacting { color: #ea4335; background: rgba(234,67,53,.10); }
+#contact .contact-icon.ig:hover i,
+#contact .contact-icon.ig:focus-visible i,
+#contact .contact-icon.ig.is-interacting i {
+  color: transparent;
+  background: linear-gradient(35deg, #feda75, #fa7e1e 28%, #d62976 55%, #962fbf 78%, #4f5bd5);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+/* Compact black editorial signature separating Home from About. */
+#home .hero-bottom-texture {
+  position: absolute;
+  left: clamp(16px, 4vw, 58px);
+  bottom: 0;
+  z-index: 6;
+  width: clamp(112px, 14vw, 190px);
+  height: clamp(12px, 1.7vw, 22px);
+  pointer-events: none;
+  background: #111;
+  clip-path: polygon(0 42%, 12% 42%, 12% 14%, 25% 14%, 25% 55%, 43% 55%, 43% 0, 61% 0, 61% 35%, 78% 35%, 78% 12%, 100% 12%, 100% 100%, 0 100%);
+  opacity: .96;
+}
+@media (max-width: 720px) {
+  #home .hero-bottom-texture {
+    left: clamp(14px, 4vw, 24px);
+    width: clamp(92px, 28vw, 132px);
+    height: 12px;
+  }
+}
+
 @media (max-width: 520px) {
   #contact .contact-selected-icon {
     top: 16px;

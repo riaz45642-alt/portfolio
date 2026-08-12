@@ -877,6 +877,28 @@ function initContactField() {
     });
     icon.addEventListener('focus', () => showSelectedIcon(icon));
     icon.addEventListener('blur', hideSelectedIcon);
+    icon.addEventListener('pointerdown', (event) => {
+      event.stopPropagation();
+      setPaused(true);
+      icon.classList.add('is-interacting');
+      showSelectedIcon(icon);
+      try { icon.setPointerCapture(event.pointerId); } catch { /* pointer capture unavailable */ }
+    });
+    icon.addEventListener('pointerup', (event) => {
+      event.stopPropagation();
+      // Stay stationary until the native anchor click has fired.
+    });
+    icon.addEventListener('pointercancel', () => {
+      icon.classList.remove('is-interacting');
+      if (!section.matches(':hover')) setPaused(false);
+    });
+    icon.addEventListener('click', () => {
+      // Native anchor behavior is intentionally left untouched.
+      window.setTimeout(() => {
+        icon.classList.remove('is-interacting');
+        if (!section.matches(':hover') && !section.contains(document.activeElement)) setPaused(false);
+      }, 180);
+    });
   });
   field.addEventListener('pointerleave', hideSelectedIcon);
   window.addEventListener('resize', layout, { passive: true });
