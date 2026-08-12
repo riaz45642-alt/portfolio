@@ -2312,6 +2312,9 @@ main { transition: filter .18s ease-out; will-change: filter; }
   }
 }
 
+/* Home → About floating portrait card */
+.hero-copy-stair { position: relative; z-index: 2; }
+
 /* Contact hover stabilization and selected-platform indicator. */
 #contact .contact-selected-icon {
   position: absolute;

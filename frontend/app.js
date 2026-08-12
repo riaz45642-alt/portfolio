@@ -504,7 +504,19 @@ function initProjectsStack() {
     });
   };
 
+  const deactivate = () => {
+    if (!grid) return;
+    grid.classList.remove('has-active');
+    cards.forEach((card) => {
+      card.classList.remove('is-active');
+      card.setAttribute('aria-expanded', 'false');
+    });
+  };
+
   cards.forEach((card) => {
+    card.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') activate(card);
+    });
     card.addEventListener('click', (event) => {
       if (!touchLayout.matches) return;
       const link = event.target.closest('.proj-cta');
@@ -518,6 +530,10 @@ function initProjectsStack() {
       event.preventDefault();
       activate(card);
     });
+  });
+
+  grid?.addEventListener('pointerleave', (event) => {
+    if (event.pointerType === 'mouse') deactivate();
   });
 }
 
