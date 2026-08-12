@@ -743,7 +743,6 @@ function initContactField() {
   const section = document.querySelector('.contact-section');
   const field = section?.querySelector('.contact-icon-row');
   const title = section?.querySelector('.contact-editorial-title');
-  const selectedIndicator = section?.querySelector('.contact-selected-icon');
   const icons = field ? [...field.querySelectorAll('.contact-icon')] : [];
   if (!section || !field || !icons.length) return;
 
@@ -805,20 +804,6 @@ function initContactField() {
     lastTime = performance.now();
   };
 
-  const showSelectedIcon = (icon) => {
-    if (!selectedIndicator) return;
-    const platformMark = icon.querySelector('i');
-    if (!platformMark) return;
-    selectedIndicator.replaceChildren(platformMark.cloneNode(true));
-    selectedIndicator.dataset.platform = [...icon.classList].find((name) => name !== 'contact-icon') || '';
-    selectedIndicator.classList.add('is-visible');
-  };
-
-  const hideSelectedIcon = () => {
-    if (!selectedIndicator) return;
-    selectedIndicator.classList.remove('is-visible');
-  };
-
   const animate = (time) => {
     const dt = Math.min((time - lastTime) / 1000, 0.035);
     lastTime = time;
@@ -848,8 +833,6 @@ function initContactField() {
     requestAnimationFrame(animate);
   };
 
-  section.addEventListener('pointerenter', () => setPaused(true));
-  section.addEventListener('pointerleave', () => setPaused(false));
   section.addEventListener('pointermove', (event) => {
     if (!title || reducedMotion.matches) return;
     const rect = section.getBoundingClientRect();
@@ -863,44 +846,6 @@ function initContactField() {
     title.style.setProperty('--contact-shift-x', '0px');
     title.style.setProperty('--contact-shift-y', '0px');
   });
-  section.addEventListener('pointerdown', () => setPaused(true));
-  section.addEventListener('pointerup', () => setPaused(false));
-  section.addEventListener('pointercancel', () => setPaused(false));
-  section.addEventListener('focusin', () => setPaused(true));
-  section.addEventListener('focusout', (event) => {
-    if (!section.contains(event.relatedTarget)) setPaused(false);
-  });
-  icons.forEach((icon) => {
-    icon.addEventListener('pointerenter', () => showSelectedIcon(icon));
-    icon.addEventListener('pointerleave', (event) => {
-      if (!event.relatedTarget?.closest?.('.contact-icon')) hideSelectedIcon();
-    });
-    icon.addEventListener('focus', () => showSelectedIcon(icon));
-    icon.addEventListener('blur', hideSelectedIcon);
-    icon.addEventListener('pointerdown', (event) => {
-      event.stopPropagation();
-      setPaused(true);
-      icon.classList.add('is-interacting');
-      showSelectedIcon(icon);
-      try { icon.setPointerCapture(event.pointerId); } catch { /* pointer capture unavailable */ }
-    });
-    icon.addEventListener('pointerup', (event) => {
-      event.stopPropagation();
-      // Stay stationary until the native anchor click has fired.
-    });
-    icon.addEventListener('pointercancel', () => {
-      icon.classList.remove('is-interacting');
-      if (!section.matches(':hover')) setPaused(false);
-    });
-    icon.addEventListener('click', () => {
-      // Native anchor behavior is intentionally left untouched.
-      window.setTimeout(() => {
-        icon.classList.remove('is-interacting');
-        if (!section.matches(':hover') && !section.contains(document.activeElement)) setPaused(false);
-      }, 180);
-    });
-  });
-  field.addEventListener('pointerleave', hideSelectedIcon);
   window.addEventListener('resize', layout, { passive: true });
   document.addEventListener('visibilitychange', () => setPaused(document.hidden));
 

@@ -2428,6 +2428,56 @@ main { transition: filter .18s ease-out; will-change: filter; }
   -webkit-background-clip: text;
 }
 
+/* Final contact interaction: native links, uninterrupted movement and
+   permanent platform colors in every pointer/focus state. */
+#contact .contact-editorial-title,
+#contact .contact-section::before,
+#contact .contact-section::after { pointer-events: none; }
+#contact .contact-icon-row { pointer-events: auto; }
+#contact .contact-icon,
+#contact .contact-icon:hover,
+#contact .contact-icon:focus,
+#contact .contact-icon:focus-visible,
+#contact .contact-icon:active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 12px 18px rgb(0 0 0 / 22%)) !important;
+  animation-play-state: running !important;
+  outline: none;
+}
+#contact .contact-icon.wa,
+#contact .contact-icon.wa:hover,
+#contact .contact-icon.wa:focus,
+#contact .contact-icon.wa:active { color: #25d366 !important; }
+#contact .contact-icon.gh,
+#contact .contact-icon.gh:hover,
+#contact .contact-icon.gh:focus,
+#contact .contact-icon.gh:active { color: #f5f5f5 !important; }
+#contact .contact-icon.em,
+#contact .contact-icon.em:hover,
+#contact .contact-icon.em:focus,
+#contact .contact-icon.em:active { color: #ea4335 !important; }
+#contact .contact-icon.li,
+#contact .contact-icon.li:hover,
+#contact .contact-icon.li:focus,
+#contact .contact-icon.li:active { color: #0a66c2 !important; }
+#contact .contact-icon.map,
+#contact .contact-icon.map:hover,
+#contact .contact-icon.map:focus,
+#contact .contact-icon.map:active { color: #ea4335 !important; }
+#contact .contact-icon.ig,
+#contact .contact-icon.ig:hover,
+#contact .contact-icon.ig:focus,
+#contact .contact-icon.ig:active { color: #e4405f !important; }
+#contact .contact-icon.ig i {
+  color: transparent !important;
+  background: linear-gradient(35deg, #feda75, #fa7e1e 28%, #d62976 55%, #962fbf 78%, #4f5bd5);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
 /* Compact black editorial signature separating Home from About. */
 #home .hero-bottom-texture {
   position: absolute;
