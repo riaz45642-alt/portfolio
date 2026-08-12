@@ -643,6 +643,7 @@
 .proj-grid .proj-card:focus-within,
 .proj-grid.has-active .proj-card.is-active {
   flex: 0 0 60%;
+  z-index: 3;
 }
 
 .proj-laptop-screen img {
