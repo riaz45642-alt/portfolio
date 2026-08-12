@@ -594,3 +594,27 @@
   .proj-tags,
   .proj-cta { transition: none !important; }
 }
+
+/* Automatic project contrast. JavaScript samples the screenshot area behind
+   the details and applies project-on-light only when that area is light. */
+.proj-card {
+  --project-text: #f8f8f8;
+  --project-text-muted: #d0d0cc;
+  --project-border: rgba(248,248,248,.34);
+  --project-info-gradient: linear-gradient(180deg, rgba(17,17,17,0) 26%, rgba(17,17,17,.18) 48%, rgba(17,17,17,.96) 100%);
+}
+.proj-card.project-on-light {
+  --project-text: #111111;
+  --project-text-muted: #343632;
+  --project-border: rgba(17,17,17,.34);
+  --project-info-gradient: linear-gradient(180deg, rgba(243,240,232,0) 26%, rgba(243,240,232,.24) 48%, rgba(243,240,232,.96) 100%);
+}
+.proj-card .proj-info { background: var(--project-info-gradient); }
+.proj-card .proj-info h3,
+.proj-card .proj-desc,
+.proj-card .proj-tags span,
+.proj-card .proj-cta { color: var(--project-text); }
+.proj-card .proj-desc { color: var(--project-text-muted); }
+.proj-card .proj-tags span,
+.proj-card .proj-cta { border-color: var(--project-border); }
+.proj-card.project-on-light::before { color: rgba(17,17,17,.62); }

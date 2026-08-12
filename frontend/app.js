@@ -421,6 +421,43 @@ function initProjectsStack() {
 
   setStat('statProjects', String(cards.length).padStart(3, '0'));
 
+  const setProjectContrast = (card, image) => {
+    if (!image.naturalWidth || !image.naturalHeight) return;
+    try {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      const sampleWidth = 48;
+      const sampleHeight = 18;
+      canvas.width = sampleWidth;
+      canvas.height = sampleHeight;
+      context.drawImage(
+        image,
+        0,
+        image.naturalHeight * 0.62,
+        image.naturalWidth,
+        image.naturalHeight * 0.38,
+        0,
+        0,
+        sampleWidth,
+        sampleHeight
+      );
+      const pixels = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
+      let luminanceTotal = 0;
+      let samples = 0;
+      for (let index = 0; index < pixels.length; index += 16) {
+        if (pixels[index + 3] < 128) continue;
+        const r = pixels[index] / 255;
+        const g = pixels[index + 1] / 255;
+        const b = pixels[index + 2] / 255;
+        luminanceTotal += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        samples += 1;
+      }
+      card.classList.toggle('project-on-light', samples > 0 && luminanceTotal / samples > 0.62);
+    } catch {
+      card.classList.remove('project-on-light');
+    }
+  };
+
   cards.forEach((card) => {
     const status = card.dataset.status;
     const cta = card.querySelector('.proj-cta');
@@ -428,6 +465,10 @@ function initProjectsStack() {
     const screen = card.querySelector('.proj-laptop-screen');
     const image = screen?.querySelector('img');
     if (screen && image) screen.style.setProperty('--project-image', `url("${image.getAttribute('src')}")`);
+    if (image) {
+      if (image.complete && image.naturalWidth) setProjectContrast(card, image);
+      else image.addEventListener('load', () => setProjectContrast(card, image), { once: true });
+    }
     if (!cta || !label) return;
     if (status === 'live' && card.dataset.live) {
       cta.href = card.dataset.live;
