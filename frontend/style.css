@@ -914,15 +914,10 @@ main { transition: filter .18s ease-out; will-change: filter; }
   will-change: transform;
 }
 .contact-icon:hover {
-  transform: translateY(-4px) scale(1.08) !important;
   color: var(--accent-hover);
   border-color: var(--accent-hover);
   box-shadow: 0 10px 24px rgba(0,0,0,.36);
-  animation-play-state: paused;
 }
-/* whole-section hover also pauses every icon's float so the cursor
-   can travel to any icon without it drifting away mid-click */
-.contact-section:hover .contact-icon { animation-play-state: paused; }
 
 .contact-icon.wa { animation-name: iconFloatA; animation-duration: 6.5s; }
 .contact-icon.ig { animation-name: iconFloatB; animation-duration: 7.5s; animation-delay: .3s; }
@@ -961,7 +956,6 @@ main { transition: filter .18s ease-out; will-change: filter; }
   font-family: 'JetBrains Mono', monospace; font-size: 8px;
   letter-spacing: .04em; color: var(--text-faint);
 }
-.contact-icon.map:hover::after { color: var(--accent); }
 
 /* floating decorative emojis — continuous, varied drift; pauses on
    hover of the whole section via animation-play-state (pure CSS) */
@@ -2445,7 +2439,15 @@ main { transition: filter .18s ease-out; will-change: filter; }
   box-shadow: none !important;
   filter: drop-shadow(0 12px 18px rgb(0 0 0 / 22%)) !important;
   animation-play-state: running !important;
+  transition: none !important;
   outline: none;
+}
+#contact .contact-icon::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: transparent;
 }
 #contact .contact-icon.wa,
 #contact .contact-icon.wa:hover,

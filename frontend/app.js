@@ -747,6 +747,7 @@ function initContactField() {
   if (!section || !field || !icons.length) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const heldIcons = new WeakSet();
   const states = icons.map((icon, index) => ({
     icon, index, x: 0, y: 0,
     vx: (index % 2 ? -1 : 1) * (14 + Math.random() * 12),
@@ -809,6 +810,7 @@ function initContactField() {
     lastTime = time;
     if (!paused && !reducedMotion.matches) {
       states.forEach((state) => {
+        if (heldIcons.has(state.icon)) return;
         const limits = limitsFor(state.icon, state);
         state.vx += Math.sin(time * 0.00033 + state.phaseX) * 7 * dt;
         state.vy += Math.cos(time * 0.00029 + state.phaseY) * 7 * dt;
@@ -845,6 +847,13 @@ function initContactField() {
     if (!title) return;
     title.style.setProperty('--contact-shift-x', '0px');
     title.style.setProperty('--contact-shift-y', '0px');
+  });
+  icons.forEach((icon) => {
+    // Briefly hold only the pressed target in place so pointer-up lands on
+    // the same native anchor. Navigation remains entirely browser-native.
+    icon.addEventListener('pointerdown', () => heldIcons.add(icon), { passive: true });
+    icon.addEventListener('pointerup', () => window.setTimeout(() => heldIcons.delete(icon), 0), { passive: true });
+    icon.addEventListener('pointercancel', () => heldIcons.delete(icon), { passive: true });
   });
   window.addEventListener('resize', layout, { passive: true });
   document.addEventListener('visibilitychange', () => setPaused(document.hidden));
