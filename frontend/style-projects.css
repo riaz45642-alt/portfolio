@@ -618,3 +618,90 @@
 .proj-card .proj-tags span,
 .proj-card .proj-cta { border-color: var(--project-border); }
 .proj-card.project-on-light::before { color: rgba(17,17,17,.62); }
+
+/* Featured gallery sizing: one focused panel receives about 60% of the
+   rail while every remaining preview shares the other 40%. */
+.proj-card,
+.proj-card:first-child,
+.proj-card:nth-child(2),
+.proj-card:nth-child(3) {
+  flex: 1 1 0%;
+  transition:
+    flex-basis .72s cubic-bezier(.22,.9,.3,1),
+    flex-grow .72s cubic-bezier(.22,.9,.3,1),
+    border-color .35s ease,
+    box-shadow .35s ease;
+}
+
+.proj-grid:has(.proj-card:hover) .proj-card,
+.proj-grid:has(.proj-card:focus-within) .proj-card,
+.proj-grid.has-active .proj-card {
+  flex: 1 1 0%;
+}
+
+.proj-grid .proj-card:hover,
+.proj-grid .proj-card:focus-within,
+.proj-grid.has-active .proj-card.is-active {
+  flex: 0 0 60%;
+}
+
+.proj-laptop-screen img {
+  filter: brightness(.78) saturate(.88);
+  transition:
+    transform .7s cubic-bezier(.22,.9,.3,1),
+    filter .42s ease;
+}
+
+.proj-card:hover .proj-laptop-screen img,
+.proj-card:focus-within .proj-laptop-screen img,
+.proj-card.is-active .proj-laptop-screen img {
+  filter: brightness(1) saturate(1);
+}
+
+@media (max-width: 860px) {
+  .proj-grid.has-active .proj-card { flex: 1 1 0%; }
+  .proj-grid.has-active .proj-card.is-active { flex: 0 0 60%; }
+}
+
+@media (max-width: 480px) {
+  .proj-grid .proj-card.is-active { flex-basis: 62%; }
+}
+
+/* Reference-inspired image-slider behaviour: compact panels show a narrow
+   crop; the focused 60% panel restores the complete, flexible screenshot. */
+.proj-card .proj-laptop-screen img {
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.01);
+  transition:
+    object-position .72s cubic-bezier(.22,.9,.3,1),
+    transform .72s cubic-bezier(.22,.9,.3,1),
+    filter .42s ease;
+}
+
+.proj-card:hover .proj-laptop-screen img,
+.proj-card:focus-within .proj-laptop-screen img,
+.proj-card.is-active .proj-laptop-screen img {
+  object-fit: contain;
+  object-position: center;
+  transform: scale(1);
+}
+
+.proj-card:hover .proj-desc,
+.proj-card:hover .proj-tags,
+.proj-card:hover .proj-cta,
+.proj-card:focus-within .proj-desc,
+.proj-card:focus-within .proj-tags,
+.proj-card:focus-within .proj-cta,
+.proj-card.is-active .proj-desc,
+.proj-card.is-active .proj-tags,
+.proj-card.is-active .proj-cta {
+  max-height: 180px;
+}
+
+@media (max-width: 480px) {
+  .proj-card.is-active .proj-info { padding: clamp(16px, 5vw, 22px); }
+  .proj-card.is-active .proj-desc,
+  .proj-card.is-active .proj-tags,
+  .proj-card.is-active .proj-cta { max-height: 210px; }
+}
