@@ -546,17 +546,18 @@ function initSkills() {
   if (!grid) return;
 
   const skills = [
-    { name: 'HTML5', level: 95 },
-    { name: 'CSS3 / SCSS', level: 90 },
-    { name: 'JavaScript', level: 82 },
-    { name: 'React.js', level: 40 },
-    { name: 'Git & GitHub', level: 78 },
-    { name: 'Responsive Design', level: 92 }
+    { name: 'HTML5', level: 95, icon: 'devicon-html5-plain colored' },
+    { name: 'CSS3 / SCSS', level: 90, icon: 'devicon-css3-plain colored' },
+    { name: 'JavaScript', level: 82, icon: 'devicon-javascript-plain colored' },
+    { name: 'React.js', level: 40, icon: 'devicon-react-original colored' },
+    { name: 'Git & GitHub', level: 78, icon: 'devicon-git-plain colored' },
+    { name: 'Responsive Design', level: 92, icon: 'fas fa-laptop-code skill-icon-responsive' }
   ];
 
   grid.innerHTML = skills.map((s, index) => `
     <div class="skill-card" style="--skill-order:${index}">
       <div class="skill-meta">
+        <i class="skill-tech-icon ${s.icon}" aria-hidden="true"></i>
         <h4>${s.name}</h4>
       </div>
       <div class="skill-bar" role="progressbar" aria-label="${s.name}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${s.level}">

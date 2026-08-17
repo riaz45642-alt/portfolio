@@ -2554,3 +2554,39 @@ textarea { resize: vertical; min-height: 52px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
 }
+
+/* Branded icons for the existing About skills (no stack additions). */
+#about .skill-meta {
+  min-height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+#about .skill-tech-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  font-size: 28px;
+  line-height: 1;
+  transition: transform .28s cubic-bezier(.22,.9,.3,1), filter .28s ease;
+}
+#about .skill-icon-responsive { color: #263a35; font-size: 25px; }
+#about .skill-card:hover .skill-tech-icon {
+  transform: translateY(-2px) scale(1.06);
+  filter: saturate(1.12);
+}
+#about .skill-meta h4 {
+  min-height: 25px;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 520px) {
+  #about .skill-tech-icon { width: 24px; height: 24px; flex-basis: 24px; font-size: 24px; }
+  #about .skill-icon-responsive { font-size: 22px; }
+}
