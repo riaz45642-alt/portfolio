@@ -2510,3 +2510,47 @@ main { transition: filter .18s ease-out; will-change: filter; }
     font-size: 29px;
   }
 }
+
+/* Final site-wide UX polish. */
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
+  padding: 10px 14px;
+  color: #111;
+  background: #f3f0e8;
+  font: 600 12px 'JetBrains Mono', monospace;
+  transform: translateY(-160%);
+  transition: transform .2s ease;
+}
+.skip-link:focus { transform: none; }
+.site-footer {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px clamp(20px, 5vw, 72px);
+  color: #aaa9a4;
+  background: #111;
+  border-top: 1px solid rgba(243,240,232,.12);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+.site-footer p { margin: 0; }
+.site-footer a { color: #f3f0e8; transition: opacity .2s ease; }
+.site-footer a:hover { opacity: .7; }
+.nav-links a { min-height: 40px; display: inline-flex; align-items: center; }
+.nav-toggle { min-width: 44px; min-height: 44px; }
+textarea { resize: vertical; min-height: 52px; }
+
+@media (max-width: 520px) {
+  .site-footer { align-items: flex-start; flex-direction: column; gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}

@@ -6,10 +6,13 @@
 <title>Muhammad Ahmad — Frontend Developer</title>
 <meta name="description" content="Portfolio of Muhammad Ahmad, a frontend developer building clean, fast, user-friendly web experiences.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="style.css?v=20260811-13">
-<link rel="stylesheet" href="style-projects.css?v=20260811-2">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+<link rel="stylesheet" href="style.css?v=20260817-1">
+<link rel="stylesheet" href="style-projects.css?v=20260817-1">
 </head>
 <body>
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <div class="bg-field"></div>
 <div class="bg-grid"></div>
@@ -36,7 +39,7 @@
   </div>
 </nav>
 
-<main>
+<main id="main-content">
 
   <!-- ============ HOME / HERO ============ -->
   <section id="home" class="hero section theme-dark">
@@ -79,7 +82,7 @@
     </aside>
     <div class="container about-content-panel">
       <p class="about-body-lead scroll-reveal letter-fall-scroll" style="max-width:680px;color:var(--text-dim);font-size:15.5px;margin-bottom:8px">
-        I'm Muhammad Ahmad, a frontend developer focused on clean, fast, user‑friendly web experiences — built with modern tools and close attention to performance and the details people feel even if they never notice them.
+        I'm Muhammad Ahmad, a developer focused on clean, fast, user‑friendly web experiences — from polished interfaces to dependable databases, built with close attention to performance and the details people feel even if they never notice them.
       </p>
       <div class="eyebrow about-tags-label scroll-reveal">skills</div>
       <div class="about-tags scroll-reveal">
@@ -114,7 +117,8 @@
   <section id="projects" class="section projects-section-light projects-section">
     <div class="container">
       <div class="section-head scroll-reveal">
-        <h2 class="section-title projects-editorial-title">OUR PROJECTS</h2>
+        <p class="projects-kicker">Selected work · 2024—2026</p>
+        <h2 class="section-title projects-editorial-title">PROJECTS</h2>
       </div>
     </div>
 
@@ -131,7 +135,7 @@
           <div class="proj-info">
             <h3>Personal Portfolio</h3>
             <p class="proj-desc">A personal portfolio website focused on frontend development, showcasing projects, skills, experience, and professional work.</p>
-            <div class="proj-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+            <div class="proj-tags" aria-label="Technologies used"><span><i class="devicon-html5-plain colored" aria-hidden="true"></i>HTML</span><span><i class="devicon-css3-plain colored" aria-hidden="true"></i>CSS</span><span><i class="devicon-javascript-plain colored" aria-hidden="true"></i>JavaScript</span></div>
             <a class="proj-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
           </div>
         </article>
@@ -144,7 +148,7 @@
           <div class="proj-info">
             <h3>Talent Bridge</h3>
             <p class="proj-desc">A job portal connecting job seekers and employers, with dashboards for finding and managing employment opportunities — plus a built-in CV Generator.</p>
-            <div class="proj-tags"><span>Node.js</span><span>Firebase</span><span>TiDB Cloud</span></div>
+            <div class="proj-tags" aria-label="Technologies used"><span><i class="devicon-nodejs-plain colored" aria-hidden="true"></i>Node.js</span><span><i class="devicon-express-original" aria-hidden="true"></i>Express.js</span><span><i class="devicon-mysql-original colored" aria-hidden="true"></i>MySQL</span></div>
             <a class="proj-cta" href="#" data-link-slot><span class="cta-label">View Live</span> <i class="fas fa-arrow-right"></i></a>
           </div>
         </article>
@@ -157,7 +161,7 @@
           <div class="proj-info">
             <h3>AI E-Commerce — Virtual Try-On</h3>
             <p class="proj-desc">A clothing e-commerce concept with AI/Gemini integration, letting users virtually preview how an item may look on them before buying.</p>
-            <div class="proj-tags"><span>AI / Gemini</span><span>E-commerce</span><span>UI/UX</span></div>
+            <div class="proj-tags" aria-label="Technologies used"><span><i class="devicon-react-original colored" aria-hidden="true"></i>React</span><span><i class="devicon-javascript-plain colored" aria-hidden="true"></i>JavaScript</span><span><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>Gemini AI</span></div>
             <a class="proj-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
           </div>
         </article>
@@ -170,7 +174,7 @@
           <div class="proj-info">
             <h3>Event Hooba</h3>
             <p class="proj-desc">An event-sharing platform where users upload and publish events so others can discover and view what's happening around them.</p>
-            <div class="proj-tags"><span>Firebase</span><span>Realtime data</span><span>Mobile-first</span></div>
+            <div class="proj-tags" aria-label="Technologies used"><span><i class="devicon-html5-plain colored" aria-hidden="true"></i>HTML</span><span><i class="devicon-css3-plain colored" aria-hidden="true"></i>CSS</span><span><i class="devicon-firebase-plain colored" aria-hidden="true"></i>Firebase</span></div>
             <a class="proj-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
           </div>
         </article>
@@ -183,7 +187,7 @@
           <div class="proj-info">
             <h3>Education Sphere</h3>
             <p class="proj-desc">An educational platform for uploading worksheets for young students, who can download, complete, and submit them back through the platform.</p>
-            <div class="proj-tags"><span>Worksheets</span><span>Student tracking</span><span>Web app</span></div>
+            <div class="proj-tags" aria-label="Technologies used"><span><i class="devicon-react-original colored" aria-hidden="true"></i>React</span><span><i class="devicon-nodejs-plain colored" aria-hidden="true"></i>Node.js</span><span><i class="devicon-mysql-original colored" aria-hidden="true"></i>MySQL</span></div>
             <a class="proj-cta" href="#" data-link-slot><span class="cta-label">In Development</span> <i class="fas fa-arrow-right"></i></a>
           </div>
         </article>
@@ -196,7 +200,7 @@
           <div class="proj-info">
             <h3>Media Show</h3>
             <p class="proj-desc">A child-focused social media platform designed around safety and parental control. Its data-filtering system prevents adult or inappropriate content from being uploaded, while parental controls help parents manage and monitor their children's platform experience.</p>
-            <div class="proj-tags"><span>React</span><span>Node.js</span><span>Express.js</span><span>PostgreSQL</span></div>
+            <div class="proj-tags" aria-label="Technologies used"><span><i class="devicon-react-original colored" aria-hidden="true"></i>React</span><span><i class="devicon-nodejs-plain colored" aria-hidden="true"></i>Node.js</span><span><i class="devicon-express-original" aria-hidden="true"></i>Express.js</span><span><i class="devicon-postgresql-plain colored" aria-hidden="true"></i>PostgreSQL</span></div>
             <a class="proj-cta" href="#" data-link-slot><span class="cta-label">View Site</span> <i class="fas fa-arrow-right"></i></a>
           </div>
         </article>
@@ -248,7 +252,11 @@
     </div>
   </section>
 </main>
-<script src="app.js?v=20260811-13"></script>
+<footer class="site-footer">
+  <p>Designed &amp; built by Muhammad Ahmad</p>
+  <a href="#home" aria-label="Back to the top">Back to top <span aria-hidden="true">↑</span></a>
+</footer>
+<script src="app.js?v=20260817-1"></script>
 </body>
 </html>
 
