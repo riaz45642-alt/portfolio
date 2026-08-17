@@ -546,24 +546,20 @@ function initSkills() {
   if (!grid) return;
 
   const skills = [
-    { name: 'HTML5', level: 95, icon: 'devicon-html5-plain colored' },
-    { name: 'CSS3 / SCSS', level: 90, icon: 'devicon-css3-plain colored' },
-    { name: 'JavaScript', level: 82, icon: 'devicon-javascript-plain colored' },
-    { name: 'React.js', level: 40, icon: 'devicon-react-original colored' },
-    { name: 'Git & GitHub', level: 78, icon: 'devicon-git-plain colored' },
-    { name: 'Responsive Design', level: 92, icon: 'fas fa-laptop-code skill-icon-responsive' }
+    { name: 'HTML5', icon: 'devicon-html5-plain colored' },
+    { name: 'CSS3 / SCSS', icon: 'devicon-css3-plain colored' },
+    { name: 'JavaScript', icon: 'devicon-javascript-plain colored' },
+    { name: 'React.js', icon: 'devicon-react-original colored' },
+    { name: 'Git & GitHub', icon: 'devicon-git-plain colored' },
+    { name: 'Responsive Design', icon: 'fas fa-laptop-code skill-icon-responsive' }
   ];
 
   grid.innerHTML = skills.map((s, index) => `
     <div class="skill-card" style="--skill-order:${index}">
-      <div class="skill-meta">
+      <div class="skill-meta" role="group" aria-label="${s.name}">
         <i class="skill-tech-icon ${s.icon}" aria-hidden="true"></i>
         <h4>${s.name}</h4>
       </div>
-      <div class="skill-bar" role="progressbar" aria-label="${s.name}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${s.level}">
-        <div class="skill-fill" data-width="${s.level}"></div>
-      </div>
-      <span class="skill-percent">${s.level}%</span>
     </div>`).join('');
 
   setStat('statStack', String(skills.length).padStart(3, '0'));
@@ -573,7 +569,6 @@ function initSkills() {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         grid.classList.add('skills-visible');
-        grid.querySelectorAll('.skill-fill').forEach((el) => { el.style.height = `${el.dataset.width}%`; });
         observer.disconnect();
       }
     });
