@@ -410,8 +410,8 @@ function initLikes() {
 /* ---------------------------------------------------------------
    Projects — soft grid of laptop-mockup cards. No scroll-linked
    animation: info reveals purely via CSS on hover/focus. This just
-   wires each card's CTA to its live/GitHub link (or disables it
-   while a project is still in development) and reports the count.
+   wires each deployed card's CTA to its live link and shows a
+   non-clickable status for projects still in development.
    --------------------------------------------------------------- */
 function initProjectsStack() {
   const cards = [...document.querySelectorAll('.proj-card')];
@@ -474,19 +474,15 @@ function initProjectsStack() {
       cta.href = card.dataset.live;
       cta.target = '_blank';
       cta.rel = 'noopener';
-      label.textContent = 'View Site';
+      label.textContent = 'Live Demo';
       cta.removeAttribute('aria-disabled');
     }
-    else if (status === 'live') {
-      cta.removeAttribute('href');
-      cta.setAttribute('aria-disabled', 'true');
-      label.textContent = 'View Site';
-      cta.addEventListener('click', (e) => e.preventDefault());
-    }
-    else if (status === 'github' && card.dataset.github) { cta.href = card.dataset.github; label.textContent = 'View on GitHub'; }
     else {
       cta.removeAttribute('href');
-      label.textContent = 'In Development';
+      cta.removeAttribute('target');
+      cta.removeAttribute('rel');
+      cta.setAttribute('aria-disabled', 'true');
+      label.textContent = 'In Development Process';
       cta.addEventListener('click', (e) => e.preventDefault());
     }
 
