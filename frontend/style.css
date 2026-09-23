@@ -2678,3 +2678,60 @@ textarea { resize: vertical; min-height: 52px; }
   #about .about-content-panel .skill-card { opacity: 1; transform: none; transition: none; }
   #about .skill-tech-icon { transition: none; }
 }
+
+/* ====================================================================
+   HERO "PORTFOLIO" TITLE — interactive hover/focus arc effect
+   Only touches the big headline (.hero-arc-title / its .rf-char
+   letters). Nothing else in the hero or page is affected. Colors are
+   reused from the existing theme variables — no new palette added.
+   ==================================================================== */
+.hero-arc-title {
+  cursor: pointer;
+  perspective: 900px;
+  -webkit-perspective: 900px;
+  outline: none;
+}
+.hero-arc-title .stair-line-1 {
+  display: inline-block;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.hero-arc-title .rf-char {
+  transform-origin: 50% 65%;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+/* Soft, transparent glow — reuses the existing accent color, no solid
+   background is ever added behind the letters */
+.hero-arc-title.hero-arc-active .rf-char {
+  text-shadow: 0 0 18px rgba(38, 58, 53, .16);
+}
+#home .hero-arc-title.hero-arc-active .rf-char { text-shadow: 0 0 18px rgba(38, 58, 53, .18); }
+
+/* Keyboard focus: visible, elegant ring that doesn't add a solid block */
+.hero-arc-title:focus-visible {
+  outline: none;
+}
+.hero-arc-title:focus-visible .stair-line-1 {
+  box-shadow: 0 0 0 1px rgba(38, 58, 53, .25);
+  border-radius: 10px;
+}
+
+/* Respect reduced-motion: disable the JS-driven transforms/glow and
+   fall back to a calm, static, fully readable headline */
+@media (prefers-reduced-motion: reduce) {
+  .hero-arc-title,
+  .hero-arc-title .stair-line-1,
+  .hero-arc-title .rf-char {
+    transition: none !important;
+  }
+  .hero-arc-title.hero-arc-active .rf-char {
+    text-shadow: none;
+  }
+}
+
+/* Touch devices: no hover state exists, so make the tap affordance
+   obvious without relying on :hover */
+@media (hover: none) {
+  .hero-arc-title { cursor: default; }
+}
