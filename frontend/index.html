@@ -7,7 +7,7 @@
 <meta name="description" content="Portfolio of Muhammad Ahmad, a frontend developer building clean, fast, user-friendly web experiences.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
-<link rel="stylesheet" href="style.css?v=20260817-3">
+<link rel="stylesheet" href="style.css?v=20261015-6">
 <link rel="stylesheet" href="style-projects.css?v=20260817-1">
 </head>
 <body>
@@ -42,31 +42,48 @@
 <main id="main-content">
 
   <!-- ============ HOME / HERO ============ -->
-  <section id="home" class="hero section theme-dark">
-    <!-- Reserved for a future background image: set it via an inline
-         style="background-image:url(...)" on this div, or by adding
-         a CSS rule targeting #home .hero-bg-layer. .hero-bg-overlay
-         keeps text readable once an image is added; both are inert
-         (no visible image) until then. -->
-    <div class="hero-bg-layer" aria-hidden="true"></div>
-    <div class="hero-bg-overlay" aria-hidden="true"></div>
-    <div class="container hero-grid hero-grid-solo">
+  <section id="home" class="hero section theme-dark hx" aria-labelledby="hxHeading">
+    <a class="hx-brand" href="#home">Muhammad Ahmad</a>
 
-      <div class="hero-copy hero-copy-stair">
-        <h1 class="stair-hero letter-fall-hero hero-arc-title" aria-label="Portfolio" tabindex="0">
-          <span class="stair-line stair-line-1" data-text="PORTFOLIO">Ahmad</span>
-        </h1>
-        <p class="hero-editorial-subtitle">Web Developer</p>
+    <div class="hx-inner">
+
+      <!-- LEFT: title, photo, location -->
+      <div class="hx-left">
+        <h1 id="hxHeading" class="hx-title"><span>Web</span> <span>Developer</span></h1>
+
+        <figure class="hx-photo">
+          <img src="assets/hero-photo.webp" alt="Portrait of Muhammad Ahmad" width="828" height="1442" fetchpriority="high">
+        </figure>
+
+        <p class="hx-caption">
+          <span class="hx-arrow" aria-hidden="true">→</span>
+          <span>Based in<br>Sheikhupura, Pakistan</span>
+        </p>
+
+        <p class="hx-foot">Design &amp; code by Ahmad</p>
       </div>
 
-      <p class="hero-editorial-role">Front-end Developer &amp; Database Developer</p>
+      <!-- RIGHT: availability, intro, name, CTA -->
+      <div class="hx-right">
+        <div class="hx-top">
+          <p class="hx-badge"><span class="hx-dot" aria-hidden="true"></span>Open for work</p>
+          <p class="hx-index" aria-hidden="true">01/</p>
+          <p class="hx-meta">Web Developer<br>Pakistan</p>
+        </div>
+
+        <div class="hx-bottom">
+          <p class="hx-desc">Building clean, responsive web experiences.</p>
+          <h2 class="hx-name">Ahmad</h2>
+          <p class="hx-year">2026 Portfolio</p>
+          <a class="hx-btn" href="#projects">View projects <span aria-hidden="true">↘</span></a>
+        </div>
+      </div>
 
     </div>
 
     <button id="likeCard" class="hero-like hero-like-corner" aria-label="Like this portfolio">
       <i class="fas fa-heart"></i> <span id="likeCount">0</span>
     </button>
-    <div class="hero-bottom-texture" aria-hidden="true"></div>
   </section>
 
   <!-- ============ ABOUT ============ -->
