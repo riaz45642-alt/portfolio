@@ -22,6 +22,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Syncopate:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@800&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -2737,18 +2738,20 @@ textarea { resize: vertical; min-height: 52px; }
 }
 
 /* ====================================================================
-   HERO v2 — editorial two-column layout (Home section only)
-   Scoped to #home.hx. Overrides the older .stair-hero / #home rules
-   above, which no longer have matching markup.
+   HERO v3 — editorial two-column layout (Home section only)
+   Proportions follow a 1920×1080 reference; on desktop every size is
+   expressed in --u (1/1920 of the viewport width) so it scales as one.
+   Scoped to #home.hx; older .stair-hero rules above no longer match.
    ==================================================================== */
 #home.hero.hx {
+  --u: calc(100vw / 1920);
   --hx-pad: clamp(20px, 5.5vw, 96px);
   --hx-ink: #111111;
   --hx-dim: #55524b;
   --hx-faint: #77736c;
   --hx-line: rgba(17,17,17,.22);
   --hx-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --hx-display: 'Anton', 'Arial Narrow', Impact, sans-serif;
+  --hx-display: 'Inter Tight', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
   display: flex;
   flex-direction: column;
@@ -2757,7 +2760,7 @@ textarea { resize: vertical; min-height: 52px; }
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
-  padding: clamp(112px, 16vh, 168px) var(--hx-pad) clamp(76px, 11vh, 104px);
+  padding: clamp(108px, 15vh, 140px) var(--hx-pad) clamp(76px, 11vh, 104px);
   overflow: hidden;
   color: var(--hx-ink);
   background-color: #f3f0e8;
@@ -2782,14 +2785,12 @@ textarea { resize: vertical; min-height: 52px; }
 #home .hx-inner {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
-  column-gap: clamp(32px, 6vw, 120px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   width: 100%;
-  max-width: 1760px;
   margin-inline: auto;
 }
 
-/* ---- shared micro-typography ---- */
+/* ---- micro-typography (mono, uppercase, wide tracking) ---- */
 #home .hx-badge,
 #home .hx-index,
 #home .hx-meta,
@@ -2797,13 +2798,12 @@ textarea { resize: vertical; min-height: 52px; }
 #home .hx-caption,
 #home .hx-foot,
 #home .hx-year,
-#home .hx-btn,
-#home .hx-photo-label {
+#home .hx-btn {
   margin: 0;
   font-family: var(--hx-mono);
-  font-size: 11px;
-  line-height: 1.55;
-  letter-spacing: .14em;
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--hx-dim);
 }
@@ -2815,54 +2815,40 @@ textarea { resize: vertical; min-height: 52px; }
 #home .hx-name {
   margin: 0;
   font-family: var(--hx-display);
-  font-weight: 400;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--hx-ink);
   white-space: nowrap;
 }
-#home .hx-title {
-  font-size: clamp(36px, 7.3vw, 150px);
-  line-height: .9;
-  letter-spacing: -.015em;
-}
-#home .hx-title span { display: inline; }
+#home .hx-title { font-size: 66px; line-height: .9; letter-spacing: -.012em; }
+#home .hx-title span { display: block; }
 
 #home .hx-photo {
   position: relative;
   width: 100%;
-  max-width: 1000px;
-  aspect-ratio: 2 / 1;
-  margin: clamp(28px, 5vh, 56px) 0 0;
-  display: grid;
-  place-items: center;
+  aspect-ratio: 8 / 3;
+  margin: 36px 0 0;
   overflow: hidden;
   border: 1px solid var(--hx-line);
-  background:
-    repeating-linear-gradient(135deg, transparent 0 11px, rgba(17,17,17,.045) 11px 12px),
-    rgba(17,17,17,.025);
+  background: rgba(17,17,17,.03);
 }
-#home .hx-photo::before {
-  content: '';
-  position: absolute;
-  top: 8px; left: 8px;
-  width: 10px; height: 10px;
-  border-top: 1px solid var(--hx-faint);
-  border-left: 1px solid var(--hx-faint);
+#home .hx-photo img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 38%;
 }
-#home .hx-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 43%; display: block; }
-#home .hx-photo:has(img)::before { display: none; }
-#home .hx-photo-label { font-size: 10px; color: var(--hx-faint); }
 
 #home .hx-caption {
   display: flex;
   align-items: flex-start;
-  gap: clamp(32px, 6vw, 96px);
+  gap: 28px;
   margin-top: 22px;
-  font-size: 10.5px;
   color: var(--hx-ink);
 }
 #home .hx-arrow { font-size: 20px; line-height: 1; letter-spacing: 0; }
-#home .hx-foot { margin-top: auto; padding-top: 28px; font-size: 10.5px; color: var(--hx-faint); }
+#home .hx-foot { margin-top: auto; padding-top: 28px; color: var(--hx-faint); }
 
 /* ---- right column ---- */
 #home .hx-right {
@@ -2881,30 +2867,26 @@ textarea { resize: vertical; min-height: 52px; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
-  font-size: 10px;
+  padding: 4px 12px;
+  font-size: 9px;
   border: 1px solid var(--hx-line);
   border-radius: 999px;
   background: rgba(255,255,255,.4);
 }
 #home .hx-dot { width: 7px; height: 7px; border-radius: 50%; background: #1fa36a; }
-#home .hx-index { margin-top: 18px; font-size: 10.5px; color: var(--hx-ink); }
-#home .hx-meta { margin-top: 10px; font-size: 10.5px; }
+#home .hx-index { margin-top: 14px; color: var(--hx-ink); }
+#home .hx-meta { margin-top: 10px; }
 
-#home .hx-desc { max-width: 28ch; margin-bottom: clamp(24px, 5vh, 56px); }
-#home .hx-name {
-  font-size: clamp(60px, 10.5vw, 220px);
-  line-height: .86;
-  letter-spacing: -.01em;
-}
-#home .hx-year { margin-top: 28px; font-size: 10.5px; }
+#home .hx-desc { max-width: 21em; margin-bottom: 40px; }
+#home .hx-name { font-size: 64px; line-height: .9; letter-spacing: -.015em; }
+#home .hx-year { margin-top: 36px; }
 #home .hx-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  margin-top: 16px;
-  padding: 0 22px;
+  margin-top: 22px;
+  padding: 0 18px;
   color: var(--hx-ink);
   border: 1px solid var(--hx-ink);
   border-radius: 999px;
@@ -2914,17 +2896,40 @@ textarea { resize: vertical; min-height: 52px; }
 #home .hx-brand:focus-visible,
 #home .hx-btn:focus-visible { outline: 2px solid var(--hx-ink); outline-offset: 3px; }
 
-/* like button stays, aligned to the hero gutter */
 #home.hx .hero-like-corner { right: var(--hx-pad); bottom: clamp(20px, 4vh, 32px); }
+
+/* ---- desktop: 1920×1080 proportions ---- */
+@media (min-width: 981px) {
+  #home.hero.hx {
+    --hx-pad: calc(var(--u) * 80);
+    padding-top: 22vh;
+    padding-bottom: 16.6vh;
+  }
+  #home .hx-brand { top: 36px; }
+  #home .hx-title { font-size: calc(var(--u) * 103); }
+  #home .hx-photo { width: calc(var(--u) * 720); margin-top: calc(var(--u) * 85); }
+  #home .hx-name  { font-size: calc(var(--u) * 100); }
+  #home .hx-badge,
+  #home .hx-index,
+  #home .hx-meta,
+  #home .hx-desc,
+  #home .hx-caption,
+  #home .hx-foot,
+  #home .hx-year,
+  #home .hx-btn { font-size: max(9px, calc(var(--u) * 10.5)); }
+  #home .hx-badge { font-size: max(8px, calc(var(--u) * 9)); }
+  #home .hx-caption { gap: calc(var(--u) * 111); }
+  #home .hx-btn { min-height: 36px; }
+  #home .hx-desc { margin-bottom: calc(var(--u) * 56); }
+}
 
 /* ---- tablet ---- */
 @media (max-width: 980px) {
   #home.hero.hx { padding-top: clamp(108px, 14vh, 140px); }
-  /* the centred nav pill is wide here, so the brand drops into the flow below it */
   #home .hx-brand { position: static; align-self: flex-start; margin-bottom: 28px; }
-  #home .hx-inner { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); column-gap: 28px; }
-  #home .hx-photo { aspect-ratio: 3 / 2; }
-  #home .hx-photo img { object-position: 50% 42%; }
+  #home .hx-inner { column-gap: 28px; }
+  #home .hx-title { font-size: clamp(36px, 7.2vw, 80px); }
+  #home .hx-name  { font-size: clamp(44px, 9vw, 86px); }
   #home .hx-caption { gap: 28px; }
 }
 
@@ -2938,13 +2943,13 @@ textarea { resize: vertical; min-height: 52px; }
   #home .hx-bottom { display: contents; }
 
   #home .hx-badge   { order: 1; align-self: flex-start; }
-  #home .hx-title   { order: 2; margin-top: 28px; font-size: min(15.4vw, 110px); }
-  #home .hx-photo   { order: 3; margin-top: 28px; }
+  #home .hx-title   { order: 2; margin-top: 28px; font-size: min(14.2vw, 96px); }
+  #home .hx-photo   { order: 3; margin-top: 28px; aspect-ratio: 3 / 2; }
   #home .hx-caption { order: 4; }
   #home .hx-index   { display: none; }
   #home .hx-meta    { order: 5; align-self: flex-start; margin-top: 28px; text-align: left; }
   #home .hx-desc    { order: 6; align-self: flex-start; margin: 14px 0 0; text-align: left; }
-  #home .hx-name    { order: 7; align-self: flex-start; margin-top: 40px; font-size: min(28vw, 200px); }
+  #home .hx-name    { order: 7; align-self: flex-start; margin-top: 40px; font-size: min(22vw, 150px); }
   #home .hx-year    { order: 8; align-self: flex-start; margin-top: 24px; }
   #home .hx-btn     { order: 9; align-self: flex-start; }
   #home .hx-foot    { order: 10; margin-top: 40px; padding-top: 0; }
