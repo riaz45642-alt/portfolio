@@ -191,7 +191,7 @@ function initSmoothScroll() {
       const el = document.querySelector(id);
       if (!el) return;
       e.preventDefault();
-      const navH = document.querySelector('.nav-wrap')?.offsetHeight || 0;
+      const navH = document.querySelector('.site-header')?.offsetHeight || 0;
       target = el.getBoundingClientRect().top + window.scrollY - navH - 26;
       clampTarget();
       if (!raf) raf = requestAnimationFrame(tick);
@@ -272,14 +272,14 @@ function initStatCounters() {
    Nav: mobile toggle, active-section highlighting, smooth offset
    --------------------------------------------------------------- */
 function initNav() {
-  const navWrap = document.querySelector('.nav-wrap');
-  const toggle = document.querySelector('.nav-toggle');
-  const links = document.querySelectorAll('.nav-links a[href^="#"]');
-  const menuLinks = document.querySelectorAll('.nav-links a');
+  const navWrap = document.querySelector('.site-header');
+  const toggle = document.querySelector('.sh-toggle');
+  const links = document.querySelectorAll('.sh-links a[href^="#"]');
+  const menuLinks = document.querySelectorAll('.sh-links a');
   const sections = [...links].map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
 
   if (toggle) {
-    toggle.addEventListener('click', () => navWrap.classList.toggle('menu-open'));
+    toggle.addEventListener('click', () => { const o = navWrap.classList.toggle('menu-open'); toggle.setAttribute('aria-expanded', String(o)); });
   }
   menuLinks.forEach((a) => a.addEventListener('click', () => navWrap.classList.remove('menu-open')));
 
@@ -880,7 +880,7 @@ function initHeroLetterRain() {
   const h1 = document.querySelector('.letter-fall-hero');
   if (!h1) return;
 
-  const navEl = document.querySelector('.nav-wrap');
+  const navEl = document.querySelector('.site-header');
   const navH  = navEl ? navEl.offsetHeight : 64;
 
   const nodes = Array.from(h1.childNodes);
@@ -1000,3 +1000,23 @@ function initAboutLetterRain() {
 /* aliases so nothing external breaks */
 function initHeroLetterFall()  { initHeroLetterRain(); }
 function initAboutLetterFall() { initAboutLetterRain(); }
+
+
+/* ---------------------------------------------------------------
+   Theme toggle (header sun/moon) — light is default, choice is saved
+   --------------------------------------------------------------- */
+(function initThemeToggle() {
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  const root = document.documentElement;
+  const sync = () => btn.setAttribute('aria-label',
+    root.getAttribute('data-theme') === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+  sync();
+  btn.addEventListener('click', () => {
+    const dark = root.getAttribute('data-theme') !== 'dark';
+    if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+    sync();
+    window.dispatchEvent(new Event('resize')); // re-run nav contrast sampling
+  });
+})();
